@@ -82,7 +82,7 @@ window.dash = (function () {
 
 /* Illustrated site map: a fixed, light "watercolor plan" palette in both themes */
 .hc-plan { --pl-lawn:#e4ebdc; --pl-lawn2:#d6e2cb; --pl-golf:#cfe0bf; --pl-road:#fbf8f2; --pl-curb:#d8cfbf; --pl-water:#9fc3cf; --pl-tree:#7fa070; --pl-tree2:#5f8558; --pl-ink:#26302c;
-  --pl-plans:#a7b0b3; --pl-permit:#e9b74a; --pl-build:#d08a22; --pl-done:#2e6b6a; --pl-future:#d9c198; margin-bottom: 1.4rem; }
+  --pl-plans:#7d868c; --pl-permit:#2f7bd0; --pl-build:#7b3fb3; --pl-done:#1f3a5f; --pl-future:#d9c198; margin-bottom: 1.4rem; }
 .hc-map { border: 1px solid var(--hc-line); border-radius: 14px; overflow: auto; background: #fff; }
 .hc-plan-inner { position: relative; width: 100%; }
 .hc-map.zoomed .hc-plan-inner { width: 200%; }
@@ -100,8 +100,9 @@ window.dash = (function () {
 .hc-plan .ridge { stroke: rgba(255,255,255,.55); stroke-width: 1.2; pointer-events: none; }
 .hc-plan .bl.future ~ .ridge { stroke: rgba(38,48,44,.16); }
 .hc-plan .lb { font-family: var(--hc-font); font-size: 15px; font-weight: 500; fill: #fff; paint-order: stroke; stroke: rgba(0,0,0,.28); stroke-width: 2.5px; pointer-events: none; }
-.hc-plan svg.plat .ridge, .hc-plan svg.plat .lb { display: none; }
-.hc-plan svg.plat .bl { opacity: .8; mix-blend-mode: multiply; stroke: rgba(38,48,44,.9); stroke-width: 2; }
+.hc-plan svg.plat .ridge, .hc-plan svg.plat .lb.un { display: none; }
+.hc-plan svg.plat .lb, .hc-plan svg.plat .lb.dark { fill: #fff; stroke: rgba(0,0,0,.35); font-size: 17px; }
+.hc-plan svg.plat .bl { opacity: .86; stroke: #fff; stroke-width: 2; }
 .hc-plan svg.plat .bl.future { fill: transparent !important; stroke: transparent; }
 .hc-plan svg.plat .bg:hover .bl.future, .hc-plan svg.plat .bg:focus-visible .bl.future { stroke: var(--pl-ink); fill: rgba(255,255,255,.25) !important; }
 .hc-plan .lb.dark { fill: var(--pl-ink); stroke: rgba(255,255,255,.75); }
@@ -127,6 +128,8 @@ window.dash = (function () {
 .hc-track span { height: 6px; border-radius: 3px; background: var(--hc-ahead); }
 .hc-track span.done { background: var(--hc-creek); }
 .hc-track span.now { background: var(--hc-amber); }
+.hc-bldg[style*="--stage"] .hc-track span.now { background: var(--stage); }
+.hc-bldg[style*="--stage"] .hc-pill { background: color-mix(in oklab, var(--stage) 14%, transparent); border-color: color-mix(in oklab, var(--stage) 55%, transparent); }
 .hc-track-lbl { display: flex; justify-content: space-between; font-size: .78rem; color: var(--hc-muted); margin-top: -.35rem; }
 .hc-bldg .latest { margin: 0; }
 .hc-bldg .asof { color: var(--hc-muted); font-size: .88rem; font-style: italic; margin-top: auto; }
@@ -257,7 +260,7 @@ dash.calc('summary', {
   const LAYOUT = [
     { lots: '1-4', addr: '6803–6809 Meadowsweet Ln', pts: [[706, 307], [743, 361], [652, 421], [616, 367]] },
     { lots: '5-8', addr: '6735–6741 Meadowsweet Ln', pts: [[506, 387], [617, 395], [613, 454], [501, 446]] },
-    { lots: '9-10', addr: '6703–6705 Meadowsweet Ln', pts: [[422, 324], [500, 324], [500, 382], [422, 382]] },
+    { lots: '9-10', addr: '6703–6705 Meadowsweet Ln', pts: [[416, 340], [474, 320], [493, 364], [435, 386]] },
     { lots: '11-14', addr: '6704–6710 Meadowsweet Ln', pts: [[150, 413], [208, 413], [208, 510], [150, 510]] },
     { lots: '15-18', addr: '6716–6722 Meadowsweet Ln', pts: [[365, 564], [369, 624], [270, 630], [266, 571]] },
     { lots: '19-22', addr: '6728–6734 Meadowsweet Ln', pts: [[418, 540], [531, 582], [509, 642], [396, 600]] },
@@ -452,7 +455,7 @@ dash.calc('summary', {
       // Cards
       rows.forEach(r => {
         const idx = Number(r.stage_index);
-        const card = el('article', 'hc-bldg'); card.id = 'b-' + String(r.building).replace(/^Lots?\s*/, '');
+        const card = el('article', 'hc-bldg'); card.style.setProperty('--stage', idx >= 6 ? '#1f3a5f' : idx >= 2 ? '#7b3fb3' : idx === 1 ? '#2f7bd0' : '#7d868c'); card.id = 'b-' + String(r.building).replace(/^Lots?\s*/, '');
         const top = el('div', 'top');
         const id = el('div'); id.append(el('div', 'name', r.building), el('div', 'addr', `${r.type} · ${r.units} homes · ${r.addresses}`));
         top.append(id, el('span', 'hc-pill' + (idx === 0 ? ' plans' : ''), r.stage));
