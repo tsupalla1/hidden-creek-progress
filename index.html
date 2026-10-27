@@ -297,6 +297,13 @@ window.dash = (function () {
 .hc-map { border: 1px solid var(--hc-line); border-radius: 14px; overflow: auto; background: #fff; }
 .hc-plan-inner { position: relative; width: 100%; }
 .hc-map.zoomed .hc-plan-inner { width: 200%; }
+.hc-swipe { display: none; margin: .45rem 0 0; font-style: italic; font-size: .9rem; color: var(--hc-muted); }
+@media (max-width: 640px) {
+  .hc-map { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+  .hc-plan-inner { width: 820px; }
+  .hc-map.zoomed .hc-plan-inner { width: 1400px; }
+  .hc-swipe { display: block; }
+}
 .hc-plan svg { display: block; width: 100%; height: auto; }
 .hc-plan .bl { stroke: rgba(38,48,44,.55); stroke-width: 1.2; stroke-linejoin: round; cursor: pointer; transition: transform .2s; }
 .hc-plan .bg:hover .bl, .hc-plan .bg:focus-visible .bl { stroke: var(--pl-ink); stroke-width: 2.2; }
@@ -401,6 +408,7 @@ window.dash = (function () {
     <div class="sec-head"><h2>The buildings</h2><p>Tap any building for its addresses and latest update</p></div>
     <div class="hc-plan" id="street" data-source="buildings">
       <div class="hc-map" id="hc-map"><div class="hc-plan-inner" id="hc-plan-inner"><svg id="hc-overlay" viewBox="0 0 1550 770" role="img" aria-label="Hidden Creek Reserve site plan, buildings shaded by construction stage"><g id="hc-scenery"></g><g id="hc-blds"></g></svg><div class="hc-tip" id="hc-tip" hidden></div></div></div>
+      <p class="hc-swipe">Swipe the map sideways to see the whole site.</p>
       <div class="hc-plan-foot"><div class="hc-legend" id="hc-legend"></div><button class="hc-zoom" id="hc-zoom" type="button" aria-pressed="false">Zoom in</button></div>
     </div>
     <div class="hc-bldgs" id="bldg-cards" data-source="buildings"></div>
