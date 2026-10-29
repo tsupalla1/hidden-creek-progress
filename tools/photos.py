@@ -25,11 +25,25 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 PHOTOS = ROOT / "photos"
-EXTS = {".jpg", ".jpeg", ".png", ".webp"}
+EXTS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"}
 MAX_EDGE = 1400
 QUALITY = 68
 MAX_PHOTOS = 48          # newest photos kept on the page
 CAMERA_NAME = re.compile(r"^(img|dsc|dscn|pxl|photo|image|mvimg|screenshot)?[\s_-]*\d*$", re.I)
+
+
+def heic_support():
+    """iPhones upload HEIC; Pillow reads it through pillow-heif, installed on first need."""
+    try:
+        import pillow_heif
+    except ImportError:
+        subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "pillow-heif"], capture_output=True)
+        try:
+            import pillow_heif
+        except ImportError:
+            return False
+    pillow_heif.register_heif_opener()
+    return True
 
 
 def building_for(path):
@@ -96,6 +110,9 @@ def load(path):
 
 def main(page):
     photos = []
+    if PHOTOS.exists() and any(p.suffix.lower() in {".heic", ".heif"} for p in PHOTOS.rglob("*")):
+        if not heic_support():
+            print("pillow-heif unavailable; HEIC photos will be skipped", file=sys.stderr)
     for path in sorted(PHOTOS.rglob("*")) if PHOTOS.exists() else []:
         if path.suffix.lower() not in EXTS or not path.is_file():
             continue
