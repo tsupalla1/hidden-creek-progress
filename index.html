@@ -247,18 +247,6 @@ window.dash = (function () {
 .hc-ph figcaption .m { display: block; color: var(--hc-muted); font-size: .85rem; }
 .hc-empty { border: 1px dashed var(--hc-line); border-radius: 14px; padding: 2rem 1.5rem; text-align: center; color: var(--hc-muted); display: flex; flex-direction: column; gap: .3rem; align-items: center; }
 .hc-empty b { color: var(--color-fg); font-weight: 500; font-size: 1.15rem; }
-.hc-compare { margin-bottom: 1.2rem; }
-.hc-compare .cmp-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; align-items: baseline; margin-bottom: .5rem; }
-.hc-compare .cmp-head b { font-weight: 500; font-size: 1.1rem; }
-.hc-cmp { width: min(100%, 52rem); position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; background: var(--hc-ahead); --pos: 50%; user-select: none; touch-action: pan-y; }
-.hc-cmp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.hc-cmp .after { clip-path: inset(0 0 0 var(--pos)); }
-.hc-cmp .handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.25); pointer-events: none; }
-.hc-cmp .handle::after { content: "‹ ›"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2.4rem; height: 2.4rem; border-radius: 50%; background: #fff; color: #26302c; display: grid; place-items: center; font-size: 1.1rem; letter-spacing: .1em; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
-.hc-cmp .tag { position: absolute; bottom: .6rem; background: rgba(20,26,24,.72); color: #fff; font-size: .85rem; padding: .15rem .6rem; border-radius: 999px; pointer-events: none; }
-.hc-cmp .tag.b { left: .6rem; } .hc-cmp .tag.a { right: .6rem; }
-.hc-cmp input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
-.hc-cmp:has(input:focus-visible) { outline: 2px solid var(--hc-creek); outline-offset: 2px; }
 .hc-lightbox { border: none; padding: 0; background: transparent; max-width: min(96vw, 80rem); max-height: 92vh; }
 .hc-lightbox::backdrop { background: rgba(10,14,13,.86); }
 .hc-lightbox figure { margin: 0; display: flex; flex-direction: column; gap: .5rem; }
@@ -270,7 +258,7 @@ window.dash = (function () {
 @media print {
   .hc { gap: 1.4rem; max-width: none; }
   .hc-wrap { padding: 0; }
-  #hc-map, .hc-swipe, .hc-plan-foot, .hc-recap-actions, .hc-recap-text, .hc-detail, .hc-chips, .hc-compare, .hc-lightbox, .hc-zoom { display: none !important; }
+  #hc-map, .hc-swipe, .hc-plan-foot, .hc-recap-actions, .hc-recap-text, .hc-detail, .hc-chips, .hc-lightbox, .hc-zoom { display: none !important; }
   #street { display: none; }
   .hc-sched { min-width: 0; font-size: .82rem; }
   .hc-sched-wrap { overflow: visible; }
@@ -346,7 +334,6 @@ window.dash = (function () {
   <section id="photos">
     <div class="sec-head"><h2>Jobsite photos</h2><p id="photo-sub">Newest first</p></div>
     <div class="hc-chips" id="photo-chips" role="group" aria-label="Show photos for"></div>
-    <div class="hc-compare" id="photo-compare" hidden></div>
     <div class="hc-gallery" id="photo-grid"></div>
   </section>
 
@@ -790,12 +777,12 @@ dash.calc('summary', {
   });
 
   function renderPhotos() {
-    const chips = document.getElementById('photo-chips'), grid = document.getElementById('photo-grid'), cmp = document.getElementById('photo-compare');
-    chips.textContent = ''; grid.textContent = ''; cmp.textContent = ''; cmp.hidden = true;
+    const chips = document.getElementById('photo-chips'), grid = document.getElementById('photo-grid');
+    chips.textContent = ''; grid.textContent = '';
     if (!photos.length) {
       chips.hidden = true;
       document.getElementById('photo-sub').textContent = 'Added each week';
-      const e = el('div', 'hc-empty'); e.append(el('b', null, 'Photos from the site start soon'), el('span', null, 'Weekly jobsite photos for each building will appear here, with before-and-after views as work moves along.'));
+      const e = el('div', 'hc-empty'); e.append(el('b', null, 'Photos from the site start soon'), el('span', null, 'Weekly jobsite photos for each building will appear here as work moves along.'));
       grid.append(e);
     } else {
       chips.hidden = false;
@@ -810,20 +797,6 @@ dash.calc('summary', {
       });
       const list = photoFilter === 'All' ? photos : photos.filter(p => p.building === photoFilter);
       document.getElementById('photo-sub').textContent = `${list.length} photo${list.length === 1 ? '' : 's'}, newest first`;
-      // Before and after: earliest vs latest photo of one building
-      const cmpB = photoFilter !== 'All' ? photoFilter : groups.slice(1).find(g => photos.filter(p => p.building === g).length > 1);
-      const own = cmpB ? photos.filter(p => p.building === cmpB) : [];
-      if (own.length > 1) {
-        const after = own[0], before = own[own.length - 1];
-        const h = el('div', 'cmp-head'); h.append(el('b', null, `${cmpB}: then and now`), el('span', 'muted', `${md(before.date)} to ${md(after.date)} · drag to compare`));
-        const box = el('div', 'hc-cmp');
-        const i1 = el('img'); i1.src = before.src; i1.alt = `${cmpB} on ${md(before.date)}`;
-        const i2 = el('img', 'after'); i2.src = after.src; i2.alt = `${cmpB} on ${md(after.date)}`;
-        const rng = el('input'); rng.type = 'range'; rng.min = 0; rng.max = 100; rng.value = 50; rng.id = 'cmp-range'; rng.setAttribute('aria-label', 'Compare then and now');
-        rng.oninput = () => box.style.setProperty('--pos', rng.value + '%');
-        box.append(i1, i2, el('span', 'handle'), el('span', 'tag b', 'Then · ' + md(before.date)), el('span', 'tag a', 'Now · ' + md(after.date)), rng);
-        cmp.append(h, box); cmp.hidden = false;
-      }
       list.forEach((p, i) => {
         const f = el('figure', 'hc-ph'); f.append(thumb(p, list, i));
         const cap = el('figcaption'); if (p.caption) cap.append(document.createTextNode(p.caption));
