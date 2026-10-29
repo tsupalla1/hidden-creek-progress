@@ -14,6 +14,19 @@ const { chromium } = require('playwright');
   await page.goto('file://' + path.resolve(page_), { waitUntil: 'networkidle' });
   await page.waitForFunction(() => document.querySelector('#bldg-cards .hc-bldg'), null, { timeout: 30000 });
   await page.evaluate(() => document.fonts.ready);
+  // print small JPEG copies of the photos; Chromium would otherwise embed them uncompressed and the PDF balloons
+  await page.evaluate(async () => {
+    for (const img of document.querySelectorAll('#photos img')) {
+      img.loading = 'eager';
+      await img.decode().catch(() => {});
+      if (!img.naturalWidth) continue;
+      const s = Math.min(1, 700 / img.naturalWidth), c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      img.src = c.toDataURL('image/jpeg', 0.72);
+      await img.decode().catch(() => {});
+    }
+  });
   await page.pdf({
     path: out, format: 'Letter', printBackground: true,
     margin: { top: '0.6in', bottom: '0.6in', left: '0.6in', right: '0.6in' },
