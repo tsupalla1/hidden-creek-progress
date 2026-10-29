@@ -16,6 +16,9 @@ body { background:var(--color-bg); color:var(--color-fg); }
 // Minimal stand-in for the dashboard runtime: serves the embedded data to the page script.
 window.dash = (function () {
   const raw = JSON.parse(document.getElementById('hc-data').textContent);
+  // Buildings kept off the page until work there is near (Lots 9-10: permitted, but not starting for a while)
+  const HIDDEN = ['Lots 9-10'];
+  if (raw.buildings) raw.buildings = raw.buildings.filter(r => !HIDDEN.includes(r.building));
   const calcs = {}, cbs = [];
   const data = (id) => {
     if (calcs[id]) { const c = calcs[id]; return { status: 'ok', data: c.fn(...c.inputs.map(i => data(i).data)) }; }
