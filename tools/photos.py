@@ -11,6 +11,7 @@ Words after the date become the caption ("2026-11-03 framing starts.jpg").
 
 Each photo is shrunk to a web-sized WebP and written into the page's
 <script id="hc-photos"> block, so the page needs no outside image host.
+It also stamps the current time into the page's "Last updated" line.
 """
 import base64
 import datetime as dt
@@ -133,6 +134,8 @@ def main(page):
         sys.exit("no hc-photos block in " + page)
     data = json.dumps(keep, ensure_ascii=False).replace("</", "<\\/")
     html = block.sub(lambda m: m.group(1) + data + m.group(3), html, count=1)
+    now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    html = re.sub(r'(<time id="hc-updated" datetime=")[^"]*(")', lambda m: m.group(1) + now + m.group(2), html, count=1)
     Path(page).write_text(html)
     size = sum(len(p["src"]) for p in keep) / 1e6
     print(f"{len(keep)} photos embedded ({size:.1f} MB), {len(photos) - len(keep)} older left out")
