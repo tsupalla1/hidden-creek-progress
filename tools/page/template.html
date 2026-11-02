@@ -289,7 +289,7 @@ window.dash = (function () {
 .hc-sheet .up li { display: grid; grid-template-columns: 4.6rem 1fr; gap: .7rem; align-items: baseline; }
 .hc-sheet .up .dt { color: var(--creek); font-size: .92rem; font-variant-numeric: lining-nums tabular-nums; }
 .thumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; }
-/* Photo timeline in the building sheet: one frame per day, oldest on the left */
+/* Photo timeline in the building sheet: one frame per day, newest on the left */
 .hc-tl { list-style: none; margin: 0 -1.25rem; padding: .2rem 1.25rem .4rem; display: flex; gap: .7rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 1.25rem; scrollbar-width: none; overscroll-behavior-x: contain; }
 .hc-tl::-webkit-scrollbar { display: none; }
 .hc-tl li { flex: none; width: min(10.5rem, 42vw); scroll-snap-align: start; display: flex; flex-direction: column; gap: .35rem; position: relative; }
@@ -851,7 +851,7 @@ window.dash = (function () {
     h.addEventListener('touchend', () => { sheet.style.transition = 'transform .2s'; if (dy > 90) { sheet.style.transform = 'translateY(100%)'; setTimeout(() => { closeSheet(); sheet.style.transform = ''; sheet.style.transition = ''; }, 180); } else { sheet.style.transform = ''; } y0 = null; });
     return h;
   };
-  // photo timeline: one frame per day, oldest first, labelled with the stage the building was in that day
+  // photo timeline: one frame per day, newest first, labelled with the stage the building was in that day
   const stageOn = (building, d) => {
     const sched = rows('schedule').filter(x => x.building === building && x.actual_start && x.actual_start <= d);
     sched.sort((a, b) => a.actual_start.localeCompare(b.actual_start) || PHASES.indexOf(a.phase) - PHASES.indexOf(b.phase));
@@ -863,11 +863,11 @@ window.dash = (function () {
     const own = allPhotos.filter(p => p.building === building);
     let tl = own.filter(p => p.tl);
     if (!tl.length) { const days = new Map(); own.forEach(p => { if (!days.has(p.date)) days.set(p.date, p); }); tl = [...days.values()]; }
-    return tl.slice().sort((a, b) => String(a.date).localeCompare(String(b.date)))
+    return tl.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)))
       .map(p => ({ ...p, caption: p.caption || stageOn(building, p.date) }));
   };
   function timelineStrip(tl, own) {
-    const wrap = el('div'), ol = el('ol', 'hc-tl'); ol.setAttribute('aria-label', 'Photo timeline, oldest first');
+    const wrap = el('div'), ol = el('ol', 'hc-tl'); ol.setAttribute('aria-label', 'Photo timeline, newest first');
     tl.forEach((p, i) => {
       const li = el('li'), d = el('div', 'd');
       d.append(el('b', null, md(p.date)), el('span', null, p.caption));
@@ -875,11 +875,9 @@ window.dash = (function () {
     });
     wrap.append(ol);
     const foot = el('div', 'hc-tl-foot');
-    foot.append(el('span', null, tl.length > 1 ? `${md(tl[0].date)} to ${md(tl[tl.length - 1].date)}` : 'More as work moves along'));
+    foot.append(el('span', null, tl.length > 1 ? `${md(tl[tl.length - 1].date)} to ${md(tl[0].date)}` : 'More as work moves along'));
     if (own.length > tl.length) { const b = el('button', null, `See all ${own.length} photos`); b.type = 'button'; b.onclick = () => openLb(own, 0); foot.append(b); }
     wrap.append(foot);
-    // start on the newest frame; swipe right to go back in time
-    requestAnimationFrame(() => { ol.scrollLeft = ol.scrollWidth; });
     return wrap;
   }
   const showSheet = () => { sheet.scrollTop = 0; if (!sheet.open) { try { sheet.showModal(); } catch (e) { sheet.setAttribute('open', ''); } } const b = sheet.querySelector('.s-body'); if (b) b.scrollTop = 0; };

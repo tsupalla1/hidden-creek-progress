@@ -14,7 +14,7 @@ Each photo is shrunk to a web-sized WebP and written into the page's
 It also stamps the current time into the page's "Last updated" line.
 
 Each building also gets a photo timeline (shown in its sheet on the page):
-one photo per date, oldest first, up to TIMELINE_MAX frames spread evenly
+one photo per date, newest first on the page, up to TIMELINE_MAX frames spread evenly
 from the first day to the latest. Those frames are marked "tl": 1. A frame
 that has aged out of the newest MAX_PHOTOS is kept as a small thumbnail
 marked "old": 1, so the timeline still starts at bare dirt; the gallery
