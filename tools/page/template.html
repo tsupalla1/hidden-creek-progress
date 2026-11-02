@@ -289,6 +289,22 @@ window.dash = (function () {
 .hc-sheet .up li { display: grid; grid-template-columns: 4.6rem 1fr; gap: .7rem; align-items: baseline; }
 .hc-sheet .up .dt { color: var(--creek); font-size: .92rem; font-variant-numeric: lining-nums tabular-nums; }
 .thumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; }
+/* Photo timeline in the building sheet: one frame per day, oldest on the left */
+.hc-tl { list-style: none; margin: 0 -1.25rem; padding: .2rem 1.25rem .4rem; display: flex; gap: .7rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 1.25rem; scrollbar-width: none; overscroll-behavior-x: contain; }
+.hc-tl::-webkit-scrollbar { display: none; }
+.hc-tl li { flex: none; width: min(10.5rem, 42vw); scroll-snap-align: start; display: flex; flex-direction: column; gap: .35rem; position: relative; }
+.hc-tl button { padding: 0; border: none; background: var(--ahead); border-radius: 12px; overflow: hidden; cursor: zoom-in; aspect-ratio: 4 / 3; display: block; width: 100%; }
+.hc-tl button:focus-visible { outline: 2px solid var(--creek); outline-offset: 2px; }
+.hc-tl img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hc-tl .tick { display: flex; align-items: center; gap: .4rem; height: .7rem; }
+.hc-tl .tick::before { content: ""; flex: none; width: .55rem; height: .55rem; border-radius: 50%; background: var(--creek); }
+.hc-tl .tick::after { content: ""; flex: 1; height: 2px; margin-right: -.7rem; background: var(--line); }
+.hc-tl li:last-child .tick::after { visibility: hidden; }
+.hc-tl .d { font-size: .9rem; line-height: 1.2; font-variant-numeric: lining-nums tabular-nums; }
+.hc-tl .d b { font-weight: 600; }
+.hc-tl .d span { display: block; color: var(--muted); font-size: .84rem; }
+.hc-tl-foot { display: flex; justify-content: space-between; align-items: center; gap: .8rem; margin-top: .5rem; color: var(--muted); font-size: .88rem; }
+.hc-tl-foot button { font: inherit; color: var(--creek); background: none; border: none; padding: .4rem 0; min-height: 2.4rem; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .hc-sheet .s-nav { display: flex; justify-content: space-between; gap: .6rem; border-top: 1px solid var(--line); padding-top: 1rem; }
 .hc-sheet .empty { color: var(--muted); font-style: italic; }
 
@@ -516,7 +532,7 @@ window.dash = (function () {
   const buildings = rows('buildings').slice().sort((a, b) => lotNum(a.building) - lotNum(b.building));
   const byLots = new Map(buildings.map(r => [lotKey(r.building), r]));
   const upcoming = rows('upcoming').slice().sort((a, b) => (a.when || '9999').localeCompare(b.when || '9999'));
-  let photos = [], photosReady = false;
+  let photos = [], allPhotos = [], photosReady = false;
 
   // ---------- header ----------
   (function () {
@@ -835,6 +851,37 @@ window.dash = (function () {
     h.addEventListener('touchend', () => { sheet.style.transition = 'transform .2s'; if (dy > 90) { sheet.style.transform = 'translateY(100%)'; setTimeout(() => { closeSheet(); sheet.style.transform = ''; sheet.style.transition = ''; }, 180); } else { sheet.style.transform = ''; } y0 = null; });
     return h;
   };
+  // photo timeline: one frame per day, oldest first, labelled with the stage the building was in that day
+  const stageOn = (building, d) => {
+    const sched = rows('schedule').filter(x => x.building === building && x.actual_start && x.actual_start <= d);
+    sched.sort((a, b) => a.actual_start.localeCompare(b.actual_start) || PHASES.indexOf(a.phase) - PHASES.indexOf(b.phase));
+    const cur = sched[sched.length - 1];
+    if (!cur) return 'Site work';
+    return cur.actual_end && cur.actual_end < d ? cur.phase + ' done' : cur.phase;
+  };
+  const timelineFor = (building) => {
+    const own = allPhotos.filter(p => p.building === building);
+    let tl = own.filter(p => p.tl);
+    if (!tl.length) { const days = new Map(); own.forEach(p => { if (!days.has(p.date)) days.set(p.date, p); }); tl = [...days.values()]; }
+    return tl.slice().sort((a, b) => String(a.date).localeCompare(String(b.date)))
+      .map(p => ({ ...p, caption: p.caption || stageOn(building, p.date) }));
+  };
+  function timelineStrip(tl, own) {
+    const wrap = el('div'), ol = el('ol', 'hc-tl'); ol.setAttribute('aria-label', 'Photo timeline, oldest first');
+    tl.forEach((p, i) => {
+      const li = el('li'), d = el('div', 'd');
+      d.append(el('b', null, md(p.date)), el('span', null, p.caption));
+      li.append(thumb(p, tl, i), el('div', 'tick'), d); ol.append(li);
+    });
+    wrap.append(ol);
+    const foot = el('div', 'hc-tl-foot');
+    foot.append(el('span', null, tl.length > 1 ? `${md(tl[0].date)} to ${md(tl[tl.length - 1].date)}` : 'More as work moves along'));
+    if (own.length > tl.length) { const b = el('button', null, `See all ${own.length} photos`); b.type = 'button'; b.onclick = () => openLb(own, 0); foot.append(b); }
+    wrap.append(foot);
+    // start on the newest frame; swipe right to go back in time
+    requestAnimationFrame(() => { ol.scrollLeft = ol.scrollWidth; });
+    return wrap;
+  }
   const showSheet = () => { sheet.scrollTop = 0; if (!sheet.open) { try { sheet.showModal(); } catch (e) { sheet.setAttribute('open', ''); } } const b = sheet.querySelector('.s-body'); if (b) b.scrollTop = 0; };
   const markSel = (lots) => document.querySelectorAll('#hc-blds .bg').forEach(g => g.classList.toggle('sel', g.dataset.lots === lots));
   function openSheet(building) {
@@ -847,8 +894,9 @@ window.dash = (function () {
     const s1 = el('div'); s1.append(el('h3', null, 'Latest'), el('p', null, r.latest), el('div', 'asof', 'Updated ' + mdy(r.as_of)));
     body.append(s1);
     const own = photos.filter(p => p.building === r.building);
-    const s3 = el('div'); s3.append(el('h3', null, own.length ? `Photos · ${own.length}` : 'Photos'));
-    if (own.length) { const g = el('div', 'thumbs'); own.forEach((p, i) => g.append(thumb(p, own, i))); s3.append(g); }
+    const s3 = el('div'), tl = timelineFor(r.building);
+    s3.append(el('h3', null, tl.length > 1 ? 'Photo timeline' : 'Photos'));
+    if (tl.length) s3.append(timelineStrip(tl, own));
     else s3.append(el('p', 'empty', photosReady ? 'No photos of this building yet.' : 'Photos are loading…'));
     body.append(s3);
     if (r.type === 'Fourplex') {
@@ -927,9 +975,10 @@ window.dash = (function () {
   function loadPhotos() {
     if (photosReady) return;
     const blk = $('hc-photos'); if (!blk) return;
-    try { photos = JSON.parse(blk.textContent) || []; } catch (e) { photos = []; }
-    photos = photos.filter(p => !dash.hidden.includes(p.building));
-    photos.sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(a.file).localeCompare(String(b.file)));
+    try { allPhotos = JSON.parse(blk.textContent) || []; } catch (e) { allPhotos = []; }
+    allPhotos = allPhotos.filter(p => !dash.hidden.includes(p.building));
+    allPhotos.sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(a.file).localeCompare(String(b.file)));
+    photos = allPhotos.filter(p => !p.old);   // older timeline frames stay out of the gallery
     photosReady = true;
     renderPhotos(); renderCovers();
     if (sheet.open && sheetFor && byLots.has(lotKey(sheetFor))) openSheet(sheetFor);
