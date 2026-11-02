@@ -27,8 +27,8 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parent.parent
 PHOTOS = ROOT / "photos"
 EXTS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"}
-MAX_EDGE = 1400
-QUALITY = 68
+MAX_EDGE = 1100         # sized for phones; keeps 48 photos well under the 16 MB page limit
+QUALITY = 58
 MAX_PHOTOS = 48          # newest photos kept on the page
 CAMERA_NAME = re.compile(r"^(img|dsc|dscn|pxl|photo|image|mvimg|screenshot)?[\s_-]*\d*$", re.I)
 
@@ -123,11 +123,6 @@ def main(page):
             print(f"skipped {path.relative_to(ROOT)}: {e}", file=sys.stderr)
     photos.sort(key=lambda p: (p["date"], p["file"]), reverse=True)
     keep = photos[:MAX_PHOTOS]
-    # always keep each building's first photo so "then and now" has a start
-    for b in {p["building"] for p in photos}:
-        first = [p for p in photos if p["building"] == b][-1]
-        if first not in keep:
-            keep.append(first)
     html = Path(page).read_text()
     block = re.compile(r'(<script type="application/json" id="hc-photos">)(.*?)(</script>)', re.S)
     if not block.search(html):
@@ -136,6 +131,9 @@ def main(page):
     html = block.sub(lambda m: m.group(1) + data + m.group(3), html, count=1)
     now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     html = re.sub(r'(<time id="hc-updated" datetime=")[^"]*(")', lambda m: m.group(1) + now + m.group(2), html, count=1)
+    # GitHub Pages serves index.html as is: make sure it starts in standards mode with a charset
+    if not html.lstrip().lower().startswith("<!doctype"):
+        html = '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n' + html.lstrip()
     Path(page).write_text(html)
     size = sum(len(p["src"]) for p in keep) / 1e6
     print(f"{len(keep)} photos embedded ({size:.1f} MB), {len(photos) - len(keep)} older left out")
