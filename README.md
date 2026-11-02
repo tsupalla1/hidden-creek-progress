@@ -6,3 +6,5 @@ Construction progress page for Hidden Creek Reserve, townhomes in Shawnee, Kansa
 - `photos/` holds jobsite photos, one folder per building. See `photos/README.md`.
 - `python3 tools/photos.py index.html` embeds the photos into the page.
 - `node tools/recap_pdf.js index.html recap.pdf` prints the PDF version linked from the weekly recap.
+- `tools/page/template.html` is the page layout (phone first). To change the layout, edit it and run `python3 tools/page/build.py index.html tools/page/template.html index.html tools/page/icon.txt`, then `tools/photos.py` again. The build carries over the current data, site plan and photos.
+- `og.jpg` is the preview image shown when the link is texted or posted.

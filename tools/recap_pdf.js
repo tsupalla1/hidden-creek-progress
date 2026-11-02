@@ -27,6 +27,19 @@ const { chromium } = require('playwright');
       await img.decode().catch(() => {});
     }
   });
+  // same for the site plan image inside the SVG
+  await page.evaluate(async () => {
+    const im = document.getElementById('hc-plat'); if (!im || !im.getAttribute('href')) return;
+    const img = new Image(); img.src = im.getAttribute('href'); await img.decode().catch(() => {});
+    if (!img.naturalWidth) return;
+    const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0);
+    im.setAttribute('href', c.toDataURL('image/jpeg', 0.7));
+    await new Promise(r => setTimeout(r, 200));
+  });
+  // print the whole site plan, not the phone close-up
+  await page.evaluate(() => { const b = document.getElementById('v-all'); if (b) b.click(); });
+  await page.waitForTimeout(600);
   await page.pdf({
     path: out, format: 'Letter', printBackground: true,
     margin: { top: '0.6in', bottom: '0.6in', left: '0.6in', right: '0.6in' },

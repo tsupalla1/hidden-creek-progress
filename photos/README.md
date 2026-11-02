@@ -15,4 +15,4 @@ Drop photos here and the progress page picks them up on the next weekday refresh
 
 **Dates and captions:** the photo's own camera date is used. To set it yourself, start the file name with the date, and any words after it become the caption: `2026-11-03 framing starts.jpg`.
 
-JPEG, PNG and WebP work. The page shows the newest 48 photos, plus each building's first photo for the then-and-now slider.
+JPEG, PNG and WebP work. The page shows the newest 48 photos.

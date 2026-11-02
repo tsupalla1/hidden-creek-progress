@@ -1,0 +1,947 @@
+<title>Hidden Creek Reserve Progress</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Construction progress at Hidden Creek Reserve, townhomes in Shawnee, Kansas. Updated each weekday from the jobsite.">
+<meta property="og:title" content="Hidden Creek Reserve construction update">
+<meta property="og:description" content="Where each building stands, this week's recap, the schedule and jobsite photos. Updated each weekday.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://progress.hiddencreekreserve.com/">
+<meta property="og:image" content="https://progress.hiddencreekreserve.com/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121615" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hidden Creek">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="{{ICON}}">
+<link rel="icon" type="image/png" href="{{ICON}}">
+<style>
+:root {
+  --color-bg:#f6f5f1; --color-panel:#ffffff; --color-fg:#1d2422; --color-fg-muted:#5c6764; --color-border-line:#dfe1dc;
+  --creek:#2e6b6a; --creek-soft:#e3eeec; --amber:#a86d14;
+  --st-plans:#7d868c; --st-permit:#2f7bd0; --st-build:#7b3fb3; --st-done:#1f3a5f;
+  --shadow: 0 1px 2px rgba(20,30,28,.06), 0 6px 20px rgba(20,30,28,.06);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --color-bg:#121615; --color-panel:#1a201e; --color-fg:#e7ece9; --color-fg-muted:#9aa6a2; --color-border-line:#2c3532; --creek:#7cc2bd; --creek-soft:#1d2d2b; --amber:#e0a14a; --st-build:#a77bd6; --st-permit:#6aa7ea; --st-done:#8fb0dd; --shadow:none; color-scheme:dark; } }
+:root[data-theme="dark"] { --color-bg:#121615; --color-panel:#1a201e; --color-fg:#e7ece9; --color-fg-muted:#9aa6a2; --color-border-line:#2c3532; --creek:#7cc2bd; --creek-soft:#1d2d2b; --amber:#e0a14a; --st-build:#a77bd6; --st-permit:#6aa7ea; --st-done:#8fb0dd; --shadow:none; color-scheme:dark; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--color-bg); color: var(--color-fg); -webkit-tap-highlight-color: transparent; }
+</style>
+<script type="application/json" id="hc-data">{{HC_DATA}}</script>
+<script>
+// Minimal stand-in for the dashboard runtime: serves the embedded data to the page script.
+window.dash = (function () {
+  const raw = JSON.parse(document.getElementById('hc-data').textContent);
+  // Buildings kept off the page until work there is near (Lots 9-10: permitted, but not starting for a while)
+  const HIDDEN = ['Lots 9-10'];
+  if (raw.buildings) raw.buildings = raw.buildings.filter(r => !HIDDEN.includes(r.building));
+  const data = (id) => raw[id] ? { status: 'ok', data: raw[id] } : { status: 'missing', data: [] };
+  return { data, hidden: HIDDEN };
+})();
+</script>
+<style>
+{{FONTS}}
+.hc-page {
+  --hc-font: 'EB Garamond', Garamond, 'Times New Roman', serif;
+  --muted: var(--color-fg-muted); --line: var(--color-border-line); --panel: var(--color-panel);
+  --ahead: color-mix(in oklab, var(--color-fg) 9%, var(--color-panel));
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  font-family: var(--hc-font); font-size: 1.0625rem; line-height: 1.5;
+}
+.hc-page *, .hc-page *::before, .hc-page *::after { box-sizing: border-box; }
+.hc-page [hidden] { display: none !important; }
+.hc-page button { font: inherit; color: inherit; }
+.hc-page h2 { font-weight: 500; font-size: 1.6rem; line-height: 1.15; margin: 0; text-wrap: balance; }
+.hc-page h3 { font-weight: 500; font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 .5rem; }
+.eyebrow { font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.muted { color: var(--muted); }
+.num { font-variant-numeric: lining-nums tabular-nums; }
+.lot { font-weight: 600; }
+
+/* Top bar with section tabs */
+.hc-bar { position: sticky; top: 0; z-index: 20; background: color-mix(in oklab, var(--color-bg) 88%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(12px); backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+.hc-bar.stuck { border-bottom-color: var(--line); }
+.hc-bar-in { max-width: 72rem; margin: 0 auto; display: flex; align-items: center; gap: 1rem; padding: 0 var(--gutter); padding-top: env(safe-area-inset-top, 0px); }
+.hc-brand { font-size: 1.05rem; font-weight: 500; white-space: nowrap; color: var(--color-fg); text-decoration: none; opacity: 0; transition: opacity .2s; display: none; }
+.hc-bar.stuck .hc-brand { opacity: 1; }
+@media (min-width: 760px) { .hc-brand { display: block; } }
+.hc-tabs { display: flex; gap: .2rem; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--gutter)); padding: .45rem var(--gutter); flex: 1; scroll-snap-type: x proximity; }
+@media (min-width: 760px) { .hc-tabs { margin: 0; padding-inline: 0; justify-content: flex-end; } }
+.hc-tabs::-webkit-scrollbar { display: none; }
+.hc-tabs a { flex: none; scroll-snap-align: start; text-decoration: none; color: var(--muted); font-size: 1rem; padding: .35rem .85rem; border-radius: 999px; white-space: nowrap; min-height: 2.25rem; display: inline-flex; align-items: center; }
+.hc-tabs a:hover { color: var(--color-fg); }
+.hc-tabs a[aria-current="true"] { background: var(--color-fg); color: var(--color-bg); }
+.hc-tabs a:focus-visible { outline: 2px solid var(--creek); outline-offset: 2px; }
+
+.hc { max-width: 72rem; margin: 0 auto; padding: .5rem var(--gutter) 3rem; padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 3rem; }
+.hc section, .hc header { scroll-margin-top: 4rem; }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .25rem 1rem; margin-bottom: 1rem; }
+.sec-head p { margin: 0; color: var(--muted); font-size: .95rem; font-style: italic; }
+
+/* Hero */
+.hc-hero { display: grid; grid-template-columns: 1fr; gap: 1.5rem; padding-top: 1rem; }
+@media (min-width: 860px) { .hc-hero { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; } }
+.hc-title h1 { font-weight: 400; font-size: clamp(2.3rem, 10vw, 3.8rem); line-height: 1; letter-spacing: -.012em; margin: .45rem 0 .6rem; text-wrap: balance; }
+.hc-title .loc { color: var(--creek); font-style: italic; font-size: 1.15rem; margin: 0; }
+.hc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem; margin-top: .7rem; }
+.hc-updated { color: var(--muted); font-size: .92rem; margin: 0; display: inline-flex; align-items: center; gap: .45rem; }
+.hc-updated::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: #3aa76d; box-shadow: 0 0 0 3px color-mix(in oklab, #3aa76d 22%, transparent); }
+.hc-share { background: none; border: none; padding: .2rem 0; color: var(--creek); cursor: pointer; font-size: .92rem; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.hc-take { font-style: italic; font-size: 1.32rem; line-height: 1.38; margin: 1.1rem 0 0; max-width: 36ch; text-wrap: pretty; }
+
+.hc-today { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 1.2rem 1.25rem 1.3rem; box-shadow: var(--shadow); }
+.hc-today .when { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: .15rem 0 .8rem; }
+.hc-today .when b { font-weight: 500; font-size: 1.2rem; }
+.hc-today .rel { color: var(--creek); font-style: italic; font-size: .95rem; white-space: nowrap; }
+.dots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .75rem; }
+.dots li { display: grid; grid-template-columns: .55rem 1fr; gap: .7rem; align-items: baseline; }
+.dots li::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--creek); transform: translateY(-.08rem); }
+.dots.open li::before { background: transparent; border: 1.5px solid var(--creek); }
+
+/* Stats */
+.hc-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-block: 1px solid var(--line); margin-top: -1.5rem; }
+.hc-stat { padding: 1rem .9rem 1.05rem 0; display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.hc-stat + .hc-stat { border-left: 1px solid var(--line); padding-left: 1rem; }
+.hc-stat .val { font-size: clamp(2rem, 8vw, 2.7rem); line-height: 1.05; font-variant-numeric: lining-nums tabular-nums; }
+.hc-stat .lbl { font-size: 1rem; line-height: 1.3; margin-top: .15rem; }
+.hc-stat .note { color: var(--muted); font-size: .9rem; font-style: italic; line-height: 1.3; }
+
+/* Recap */
+.hc-recap { border: 1px solid var(--line); border-radius: 18px; padding: 1.3rem 1.25rem; background: var(--panel); display: flex; flex-direction: column; gap: 1.1rem; box-shadow: var(--shadow); }
+.hc-recap .sec-head { margin: 0; }
+.hc-recap-sum { font-size: 1.2rem; font-style: italic; margin: 0; max-width: 60ch; }
+.hc-recap-grid { display: grid; grid-template-columns: 1fr; gap: 1.3rem; }
+@media (min-width: 700px) { .hc-recap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2.5rem; } }
+.hc-recap-grid h3 { margin-bottom: .6rem; }
+.hc-actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; border-top: 1px solid var(--line); padding-top: 1.1rem; }
+.hc-btn { font-size: 1rem; color: var(--creek); background: none; border: 1px solid color-mix(in oklab, var(--creek) 40%, transparent); border-radius: 999px; padding: .45rem 1.1rem; min-height: 2.75rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .45rem; }
+.hc-btn:hover { background: var(--creek-soft); }
+.hc-btn:focus-visible { outline: 2px solid var(--creek); outline-offset: 2px; }
+.hc-btn.primary { background: var(--creek); color: var(--color-bg); border-color: var(--creek); }
+.hc-btn svg { width: 1.05em; height: 1.05em; }
+.hc-copied { color: var(--muted); font-style: italic; font-size: .92rem; }
+.hc-recap-text { width: 100%; min-height: 12rem; font: .9rem/1.45 ui-monospace, Menlo, monospace; color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--line); border-radius: 10px; padding: .7rem; }
+
+/* Site plan */
+.hc-plan { margin-bottom: 1.25rem; --pl-ink:#26302c; --pl-future:#d9c198; }
+.hc-map { position: relative; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #fff; box-shadow: var(--shadow); }
+.hc-map svg { display: block; width: 100%; height: auto; touch-action: manipulation; }
+.hc-map .bl { stroke: #fff; stroke-width: 2; opacity: .86; cursor: pointer; transition: opacity .15s; }
+.hc-map .bl.future { fill: transparent !important; stroke: transparent; }
+.hc-map .bg { outline: none; cursor: pointer; }
+.hc-map .bg:hover .bl, .hc-map .bg:focus-visible .bl { stroke: var(--pl-ink); stroke-width: 3; opacity: 1; }
+.hc-map .bg:hover .bl.future, .hc-map .bg:focus-visible .bl.future { fill: rgba(255,255,255,.3) !important; }
+.hc-map .bg.sel .bl { stroke: var(--pl-ink); stroke-width: 4; opacity: 1; }
+.hc-map .lb { font-family: var(--hc-font); font-size: 18px; font-weight: 600; fill: #fff; paint-order: stroke; stroke: rgba(0,0,0,.4); stroke-width: 3px; pointer-events: none; }
+.hc-map .lb.un { display: none; }
+.hc-map .pulse { fill: none; stroke: #fff; stroke-width: 3; pointer-events: none; opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .hc-map .pulse { animation: hc-pulse 2.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes hc-pulse { 0% { opacity: .9; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(1.35); } }
+}
+.hc-tip { position: absolute; z-index: 2; max-width: 16rem; background: var(--panel); color: var(--color-fg); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.15); padding: .5rem .7rem; font-size: .92rem; pointer-events: none; }
+.hc-tip b { display: block; font-weight: 600; }
+.hc-tip .ad { display: block; color: var(--muted); font-style: italic; }
+.hc-plan-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .7rem 1rem; margin-top: .75rem; }
+.hc-legend { display: flex; flex-wrap: wrap; gap: .35rem 1rem; font-size: .9rem; color: var(--muted); }
+.hc-legend span { display: inline-flex; align-items: center; gap: .4rem; }
+.hc-legend i { width: .8rem; height: .8rem; border-radius: 3px; display: inline-block; }
+.hc-seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--panel); }
+.hc-seg button { border: none; background: none; border-radius: 999px; padding: .3rem .9rem; min-height: 2.25rem; cursor: pointer; color: var(--muted); font-size: .95rem; white-space: nowrap; }
+.hc-seg button[aria-pressed="true"] { background: var(--color-fg); color: var(--color-bg); }
+.hc-seg button:focus-visible { outline: 2px solid var(--creek); outline-offset: 2px; }
+
+/* Building cards */
+.hc-bldgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: 1rem; }
+.hc-bldg { position: relative; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); display: flex; flex-direction: column; min-width: 0; overflow: hidden; box-shadow: var(--shadow); cursor: pointer; transition: transform .15s, box-shadow .15s; text-align: left; padding: 0; }
+.hc-bldg:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(20,30,28,.06), 0 12px 28px rgba(20,30,28,.10); }
+.hc-bldg:focus-visible { outline: 2px solid var(--creek); outline-offset: 3px; }
+.hc-bldg .cover { aspect-ratio: 16 / 8; background: var(--ahead); overflow: hidden; position: relative; }
+.hc-bldg .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hc-bldg .cover .n { position: absolute; right: .6rem; bottom: .55rem; background: rgba(15,20,19,.62); color: #fff; font-size: .8rem; padding: .1rem .55rem; border-radius: 999px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.hc-bldg .body { padding: 1rem 1.15rem 1.05rem; display: flex; flex-direction: column; gap: .7rem; flex: 1; }
+.hc-bldg .top { display: flex; justify-content: space-between; align-items: flex-start; gap: .8rem; }
+.hc-bldg .name { font-size: 1.4rem; font-weight: 500; line-height: 1.1; }
+.hc-bldg .addr { color: var(--muted); font-size: .9rem; line-height: 1.35; margin-top: .15rem; }
+.hc-bldg .latest { margin: 0; }
+.hc-bldg .foot { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-top: auto; color: var(--muted); font-size: .88rem; font-style: italic; }
+.hc-bldg .more { color: var(--creek); font-style: normal; white-space: nowrap; }
+.hc-pill { font-size: .85rem; padding: .12rem .7rem; border-radius: 999px; white-space: nowrap; background: color-mix(in oklab, var(--stage, var(--st-plans)) 14%, transparent); border: 1px solid color-mix(in oklab, var(--stage, var(--st-plans)) 50%, transparent); color: var(--color-fg); }
+.hc-phases { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; }
+.hc-phases > span { height: 7px; border-radius: 4px; background: var(--ahead); position: relative; overflow: hidden; }
+.hc-phases > span.done { background: var(--creek); }
+.hc-phases > span.now { background: color-mix(in oklab, var(--st-build) 30%, var(--ahead)); }
+.hc-phases > span.now::after { content: ""; position: absolute; inset: 0 50% 0 0; background: var(--st-build); border-radius: 4px; }
+.hc-phase-lbl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; font-size: .74rem; color: var(--muted); margin-top: .3rem; }
+.hc-phase-lbl span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hc-phase-lbl span.now { color: var(--color-fg); font-weight: 600; }
+.hc-pct { display: flex; justify-content: space-between; font-size: .88rem; color: var(--muted); margin-bottom: .35rem; }
+
+/* Schedule: table on wide screens, stacked list on phones */
+.hc-sched-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); display: none; box-shadow: var(--shadow); }
+@media (min-width: 900px) { .hc-sched-wrap { display: block; } .hc-sched-list { display: none !important; } }
+.hc-sched { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.hc-sched th, .hc-sched td { text-align: left; vertical-align: top; padding: .75rem .7rem; border-bottom: 1px solid var(--line); }
+.hc-sched tr:last-child td, .hc-sched tr:last-child th { border-bottom: none; }
+.hc-sched thead th { font-weight: 500; font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.hc-sched tbody th { font-weight: 500; font-size: 1.1rem; white-space: nowrap; }
+.hc-sched tbody th .pct { display: block; font-weight: 400; font-size: .88rem; color: var(--muted); font-variant-numeric: lining-nums tabular-nums; }
+.hc-sched .bar { height: 5px; border-radius: 3px; background: var(--ahead); margin-top: .35rem; width: 6rem; overflow: hidden; }
+.hc-sched .bar i { display: block; height: 100%; background: var(--creek); }
+.hc-cell { border-radius: 10px; padding: .45rem .6rem; border: 1px dashed var(--line); min-height: 3.1rem; display: flex; flex-direction: column; gap: .1rem; font-variant-numeric: lining-nums tabular-nums; }
+.hc-cell .s { font-weight: 600; font-size: .9rem; }
+.hc-cell .d { font-size: .86rem; color: var(--muted); }
+.hc-cell.done { border: 1px solid color-mix(in oklab, var(--creek) 40%, transparent); background: var(--creek-soft); }
+.hc-cell.now { border: 1px solid color-mix(in oklab, var(--st-build) 50%, transparent); background: color-mix(in oklab, var(--st-build) 10%, var(--panel)); }
+.hc-cell.now .s { color: color-mix(in oklab, var(--st-build) 75%, var(--color-fg)); }
+.hc-cell.wait .s { color: var(--muted); font-weight: 400; font-style: italic; }
+.late { color: var(--amber) !important; }
+.hc-sched-list { display: flex; flex-direction: column; gap: .8rem; }
+.hc-sl { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 1rem 1.15rem; box-shadow: var(--shadow); }
+.hc-sl .h { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: .7rem; }
+.hc-sl .h b { font-weight: 500; font-size: 1.2rem; }
+.hc-steps { list-style: none; margin: 0; padding: 0; position: relative; }
+.hc-steps li { display: grid; grid-template-columns: 1.4rem 1fr; gap: .7rem; position: relative; padding-bottom: .7rem; }
+.hc-steps li:last-child { padding-bottom: 0; }
+.hc-steps li::after { content: ""; position: absolute; left: calc(.7rem - 1px); top: 1.35rem; bottom: .1rem; width: 2px; background: var(--line); }
+.hc-steps li:last-child::after { display: none; }
+.hc-steps li.done::after { background: var(--creek); }
+.hc-steps .dot { width: 1.4rem; height: 1.4rem; border-radius: 50%; border: 2px solid var(--line); background: var(--panel); display: grid; place-items: center; margin-top: .05rem; }
+.hc-steps li.done .dot { background: var(--creek); border-color: var(--creek); }
+.hc-steps li.done .dot::after { content: ""; width: .45rem; height: .25rem; border: 2px solid var(--color-bg); border-top: none; border-right: none; transform: rotate(-45deg) translate(1px, -1px); }
+.hc-steps li.now .dot { border-color: var(--st-build); }
+.hc-steps li.now .dot::after { content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: var(--st-build); }
+.hc-steps .t { font-weight: 500; }
+.hc-steps li.wait .t { color: var(--muted); font-weight: 400; }
+.hc-steps .d { display: block; color: var(--muted); font-size: .9rem; line-height: 1.35; font-variant-numeric: lining-nums tabular-nums; }
+.hc-sl-det { list-style: none; margin: .8rem 0 0; padding: .7rem 0 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: .4rem; font-size: .95rem; }
+.hc-sl-det li { display: grid; grid-template-columns: 5.6rem 1fr; gap: .6rem; align-items: baseline; }
+.hc-sl-det b { font-weight: 600; }
+.hc-sl-det li.now b { color: color-mix(in oklab, var(--st-build) 75%, var(--color-fg)); }
+.hc-sl-det li.done b { color: var(--creek); }
+.hc-sl-det li.wait { color: var(--muted); }
+.hc-sl-det li.wait b { font-weight: 500; }
+.hc-sl-det span { font-variant-numeric: lining-nums tabular-nums; }
+.hc-note { color: var(--muted); font-size: .9rem; font-style: italic; margin: .8rem 0 0; }
+
+/* Photos */
+.hc-chips { display: flex; gap: .45rem; margin: 0 calc(-1 * var(--gutter)) 1rem; padding: 0 var(--gutter); overflow-x: auto; scrollbar-width: none; }
+.hc-chips::-webkit-scrollbar { display: none; }
+.hc-chip { flex: none; font-size: .95rem; padding: .3rem .95rem; min-height: 2.4rem; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); cursor: pointer; }
+.hc-chip[aria-pressed="true"] { background: var(--color-fg); border-color: var(--color-fg); color: var(--color-bg); }
+.hc-chip:focus-visible { outline: 2px solid var(--creek); outline-offset: 2px; }
+.hc-chip .n { opacity: .65; font-variant-numeric: lining-nums; }
+.hc-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+@media (min-width: 640px) { .hc-gallery { grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: .8rem; } }
+.hc-ph { margin: 0; display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+.hc-ph button, .thumbs button { padding: 0; border: none; background: var(--ahead); border-radius: 12px; overflow: hidden; cursor: zoom-in; aspect-ratio: 4 / 3; display: block; width: 100%; }
+.hc-ph button:focus-visible, .thumbs button:focus-visible { outline: 2px solid var(--creek); outline-offset: 2px; }
+.hc-ph img, .thumbs img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+@media (hover: hover) { .hc-ph button:hover img { transform: scale(1.03); } }
+.hc-ph figcaption { font-size: .88rem; line-height: 1.3; }
+.hc-ph figcaption .m { display: block; color: var(--muted); font-size: .84rem; }
+.hc-more { margin-top: 1rem; display: flex; justify-content: center; }
+.hc-empty { border: 1px dashed var(--line); border-radius: 18px; padding: 2rem 1.5rem; text-align: center; color: var(--muted); display: flex; flex-direction: column; gap: .3rem; align-items: center; grid-column: 1 / -1; }
+.hc-empty b { color: var(--color-fg); font-weight: 500; font-size: 1.15rem; }
+.hc-loading { grid-column: 1 / -1; color: var(--muted); font-style: italic; }
+
+/* Coming up agenda */
+.hc-agenda { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.ag-day { display: grid; grid-template-columns: 6.2rem 1fr; gap: 1rem; padding: .9rem 0; border-bottom: 1px solid var(--line); }
+@media (min-width: 640px) { .ag-day { grid-template-columns: 9rem 1fr; } }
+.ag-date b { display: block; font-weight: 500; font-size: 1.1rem; line-height: 1.2; }
+.ag-date span { color: var(--muted); font-size: .9rem; font-variant-numeric: lining-nums; }
+.ag-day.soon .ag-date b { color: var(--creek); }
+.ag-day.past { opacity: .6; }
+.ag-day ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
+.ag-day li .lot { display: block; font-size: .85rem; letter-spacing: .02em; color: var(--muted); font-weight: 600; }
+
+.hc-foot { color: var(--muted); font-size: .92rem; font-style: italic; border-top: 1px solid var(--line); padding-top: 1rem; margin: 0; }
+
+/* Building sheet: bottom sheet on phones, centered panel on wide screens */
+.hc-sheet { border: none; padding: 0; margin: 0; inset: auto 0 0 0; width: 100%; max-width: 100%; max-height: 92dvh; border-radius: 20px 20px 0 0; background: var(--panel); color: var(--color-fg); box-shadow: 0 -10px 40px rgba(0,0,0,.25); font-family: var(--hc-font); overflow: hidden; display: none; flex-direction: column; }
+.hc-sheet[open] { display: flex; }
+.hc-sheet::backdrop { background: rgba(10,14,13,.45); }
+@media (prefers-reduced-motion: no-preference) {
+  .hc-sheet[open] { animation: hc-up .32s cubic-bezier(.2,.8,.2,1); }
+  @keyframes hc-up { from { transform: translateY(40%); opacity: .4; } to { transform: none; opacity: 1; } }
+}
+@media (min-width: 760px) {
+  .hc-sheet { inset: 0; margin: auto; width: min(46rem, 92vw); max-height: 88vh; border-radius: 20px; }
+  .hc-sheet .grab { display: none; }
+}
+.hc-sheet .s-head { padding: .35rem 1.25rem .9rem; border-bottom: 1px solid var(--line); flex: none; touch-action: none; }
+.hc-sheet .grab { width: 2.6rem; height: 5px; border-radius: 3px; background: var(--line); margin: .35rem auto .6rem; }
+.hc-sheet .s-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.hc-sheet .s-name { font-size: 1.65rem; font-weight: 500; line-height: 1.1; display: flex; flex-wrap: wrap; gap: .4rem .7rem; align-items: center; }
+.hc-sheet .s-addr { color: var(--muted); font-size: .95rem; margin-top: .2rem; }
+.hc-sheet .s-close { flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid var(--line); background: var(--color-bg); color: var(--color-fg); cursor: pointer; display: grid; place-items: center; font-size: 1.4rem; line-height: 1; }
+.hc-sheet .s-body { overflow-y: auto; overscroll-behavior: contain; padding: 1.1rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 1.4rem; }
+.hc-sheet p { margin: 0; }
+.hc-sheet .asof { color: var(--muted); font-size: .88rem; font-style: italic; margin-top: .3rem; }
+.hc-sheet .up { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
+.hc-sheet .up li { display: grid; grid-template-columns: 4.6rem 1fr; gap: .7rem; align-items: baseline; }
+.hc-sheet .up .dt { color: var(--creek); font-size: .92rem; font-variant-numeric: lining-nums tabular-nums; }
+.thumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; }
+.hc-sheet .s-nav { display: flex; justify-content: space-between; gap: .6rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+.hc-sheet .empty { color: var(--muted); font-style: italic; }
+
+/* Photo viewer */
+.hc-lb { border: none; padding: 0; margin: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; background: #0b0f0e; color: #eef2f0; font-family: var(--hc-font); overflow: hidden; }
+.hc-lb[open] { display: grid; grid-template-rows: auto 1fr auto; }
+.hc-lb::backdrop { background: #0b0f0e; }
+.hc-lb .lb-top { display: flex; justify-content: space-between; align-items: center; padding: calc(.6rem + env(safe-area-inset-top, 0px)) 1rem .6rem; }
+.hc-lb .lb-count { font-size: .95rem; opacity: .8; font-variant-numeric: lining-nums tabular-nums; }
+.hc-lb .lb-stage { position: relative; overflow: hidden; touch-action: pan-y pinch-zoom; display: grid; place-items: center; min-height: 0; }
+.hc-lb .lb-stage img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none; transition: transform .25s cubic-bezier(.2,.8,.2,1), opacity .2s; }
+.hc-lb .lb-cap { padding: .7rem 1rem calc(.9rem + env(safe-area-inset-bottom, 0px)); font-size: 1rem; text-align: center; }
+.hc-lb .lb-cap .m { display: block; opacity: .7; font-size: .9rem; }
+.hc-lb button { border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.1); color: #eef2f0; border-radius: 999px; min-width: 2.75rem; min-height: 2.75rem; cursor: pointer; font-size: 1.1rem; }
+.hc-lb .lb-arrow { position: absolute; top: 50%; transform: translateY(-50%); display: none; }
+@media (hover: hover) and (min-width: 700px) { .hc-lb .lb-arrow { display: block; } }
+.hc-lb .lb-prev { left: 1rem; } .hc-lb .lb-next { right: 1rem; }
+
+@media print {
+  .hc-bar, .hc-share, .hc-actions, .hc-recap-text, .hc-plan-foot .hc-seg, .hc-chips, .hc-sheet, .hc-lb, .hc-more, .hc-sched-list, .hc-bldg .cover, .hc-bldg .more, .hc-tip { display: none !important; }
+  .hc-sched-wrap { display: block !important; overflow: visible; box-shadow: none; }
+  body, .hc-page { background: #fff !important; }
+  .hc-recap { break-inside: auto; }
+  .sec-head, h2, h3 { break-after: avoid; }
+  .hc-today .rel { display: none; }
+  .hc { gap: 1.3rem; max-width: none; padding: 0; font-size: 10.5pt; }
+  .hc-page { font-size: 10.5pt; }
+  .hc-hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1.2rem; padding-top: 0; }
+  .hc-title h1 { font-size: 30pt; }
+  .hc-stats { margin-top: 0; }
+  .hc-stat .val { font-size: 22pt; }
+  .hc-recap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hc-bldgs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+  .hc-bldg, .hc-sched-wrap, .hc-ph, .hc-today, .hc-map, .ag-day { break-inside: avoid; box-shadow: none; }
+  .hc-bldg .body { padding: .7rem .9rem; gap: .45rem; }
+  .hc-sched { font-size: .82rem; }
+  .hc-gallery { grid-template-columns: repeat(3, 1fr); }
+  .hc-gallery > :nth-child(n+7) { display: none; }
+  .hc-empty, #photos:has(.hc-empty) { display: none; }
+  .sec-head p { display: none; }
+  .hc-map .pulse { display: none; }
+  * { animation: none !important; }
+}
+</style>
+
+<div class="hc-page">
+<div class="hc-bar" id="hc-bar">
+  <div class="hc-bar-in">
+    <a class="hc-brand" href="#top">Hidden Creek Reserve</a>
+    <nav class="hc-tabs" id="hc-tabs" aria-label="Sections">
+      <a href="#today">Today</a><a href="#recap">This week</a><a href="#buildings">Buildings</a><a href="#schedule">Schedule</a><a href="#photos">Photos</a><a href="#upcoming">Coming up</a>
+    </nav>
+  </div>
+</div>
+
+<main class="hc">
+  <header class="hc-hero" id="top">
+    <div class="hc-title">
+      <p class="eyebrow">Construction update by Tyler Supalla, Supervisor</p>
+      <h1>Hidden Creek Reserve</h1>
+      <p class="loc">Townhomes in Shawnee, Kansas</p>
+      <div class="hc-meta">
+        <p class="hc-updated">Last updated <time id="hc-updated" datetime="{{UPDATED}}"></time></p>
+        <button class="hc-share" id="hc-share" type="button">Share this page</button>
+      </div>
+      <p class="hc-take" id="takeaway"></p>
+    </div>
+    <section class="hc-today" id="today" aria-labelledby="today-h">
+      <p class="eyebrow" id="today-h">Latest from the site</p>
+      <div class="when"><b id="today-date">—</b><span class="rel" id="today-rel"></span></div>
+      <ul class="dots" id="today-list"></ul>
+    </section>
+  </header>
+
+  <section class="hc-stats" id="kpis" aria-label="At a glance">
+    <div class="hc-stat"><div class="val" id="k-homes">—</div><div class="lbl">homes under construction</div><div class="note" id="k-homes-note"></div></div>
+    <div class="hc-stat"><div class="val" id="k-next">—</div><div class="lbl" id="k-next-lbl">next on site</div><div class="note" id="k-next-note"></div></div>
+  </section>
+
+  <section class="hc-recap" id="recap">
+    <div class="sec-head"><h2>Weekly recap</h2><p id="recap-week">—</p></div>
+    <p class="hc-recap-sum" id="recap-sum"></p>
+    <div class="hc-recap-grid">
+      <div><h3>This week</h3><ul class="dots" id="recap-this"></ul></div>
+      <div><h3>Next week</h3><ul class="dots open" id="recap-next"></ul></div>
+    </div>
+    <div class="hc-actions">
+      <a class="hc-btn primary" id="recap-pdf" href="https://progress.hiddencreekreserve.com/recap.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10m0 0-4-4m4 4 4-4M4 15v2h12v-2"/></svg>Download PDF</a>
+      <button class="hc-btn" id="recap-copy" type="button">Copy as email</button>
+      <span class="hc-copied" id="recap-copied" role="status"></span>
+    </div>
+    <textarea id="recap-text" class="hc-recap-text" readonly hidden aria-label="Recap as email text"></textarea>
+  </section>
+
+  <section id="buildings">
+    <div class="sec-head"><h2>The buildings</h2><p>Tap a building for its progress, photos and what's next</p></div>
+    <div class="hc-plan" id="street">
+      <div class="hc-map" id="hc-map"><svg id="hc-overlay" viewBox="0 0 1550 770" role="group" aria-label="Hidden Creek Reserve site plan, buildings shaded by construction stage"><rect width="1550" height="770" fill="#fff"/><image id="hc-plat" width="1550" height="770"/><g id="hc-blds"></g></svg><div class="hc-tip" id="hc-tip" hidden></div></div>
+      <div class="hc-plan-foot">
+        <div class="hc-legend" id="hc-legend"></div>
+        <div class="hc-seg" role="group" aria-label="Site plan view"><button type="button" id="v-active" aria-pressed="true">Active buildings</button><button type="button" id="v-all" aria-pressed="false">Whole site</button></div>
+      </div>
+    </div>
+    <div class="hc-bldgs" id="bldg-cards"></div>
+  </section>
+
+  <section id="schedule">
+    <div class="sec-head"><h2>Schedule</h2><p>Each fourplex, phase by phase</p></div>
+    <div class="hc-sched-list" id="sched-list"></div>
+    <div class="hc-sched-wrap"><table class="hc-sched" id="sched-table"></table></div>
+    <p class="hc-note">Actual dates are the first and last days the field notes record the work. Target dates appear as the master schedule fills in. Percent complete is a rough estimate by phase.</p>
+  </section>
+
+  <section id="photos">
+    <div class="sec-head"><h2>Jobsite photos</h2><p id="photo-sub">Newest first</p></div>
+    <div class="hc-chips" id="photo-chips" role="group" aria-label="Show photos for"></div>
+    <div class="hc-gallery" id="photo-grid"><p class="hc-loading">Loading photos…</p></div>
+    <div class="hc-more" id="photo-more" hidden><button class="hc-btn" type="button" id="photo-more-btn">Show all photos</button></div>
+  </section>
+
+  <section id="upcoming">
+    <div class="sec-head"><h2>Coming up</h2><p>Target dates can move with weather and crews</p></div>
+    <div class="hc-agenda" id="upcoming-list"></div>
+  </section>
+
+  <p class="hc-foot">Hidden Creek Reserve is a 59-home townhome community with a clubhouse, built in fourplex and duplex buildings. This page updates each weekday evening from the supervisor's field notes and jobsite photos.</p>
+</main>
+
+<dialog class="hc-sheet" id="hc-sheet" aria-labelledby="s-name"></dialog>
+<dialog class="hc-lb" id="hc-lightbox" aria-label="Photo viewer">
+  <div class="lb-top"><span class="lb-count" id="lb-count"></span><button type="button" id="lb-close" aria-label="Close photo">✕</button></div>
+  <div class="lb-stage" id="lb-stage"><img id="lb-img" alt=""><button type="button" class="lb-arrow lb-prev" id="lb-prev" aria-label="Previous photo">‹</button><button type="button" class="lb-arrow lb-next" id="lb-next" aria-label="Next photo">›</button></div>
+  <div class="lb-cap" id="lb-cap"></div>
+</dialog>
+</div>
+<script>window.HC_PLAT = "{{PLAT}}";</script>
+<script>
+(function () {
+  // ---------- helpers ----------
+  const SITE = 'https://progress.hiddencreekreserve.com/';
+  const STAGES = ['Plans', 'Permits', 'Foundation', 'Framing', 'Rough-ins', 'Finishes', 'Complete'];
+  const PHASES = ['Foundation', 'Framing', 'Roof', 'Drywall', 'Finishes'];
+  const WEIGHT = { Foundation: 15, Framing: 30, Roof: 10, Drywall: 20, Finishes: 25 };
+  const LAYOUT = [
+    { lots: '1-4', addr: '6803–6809 Meadowsweet Ln', pts: [[706, 307], [743, 361], [652, 421], [616, 367]] },
+    { lots: '5-8', addr: '6735–6741 Meadowsweet Ln', pts: [[506, 387], [617, 395], [613, 454], [501, 446]] },
+    { lots: '9-10', addr: '6703–6705 Meadowsweet Ln', pts: [[416, 340], [474, 320], [493, 364], [435, 386]] },
+    { lots: '11-14', addr: '6704–6710 Meadowsweet Ln', pts: [[150, 413], [208, 413], [208, 510], [150, 510]] },
+    { lots: '15-18', addr: '6716–6722 Meadowsweet Ln', pts: [[365, 564], [369, 624], [270, 630], [266, 571]] },
+    { lots: '19-22', addr: '6728–6734 Meadowsweet Ln', pts: [[418, 540], [531, 582], [509, 642], [396, 600]] },
+    { lots: '23-26', addr: '6740–6746 Meadowsweet Ln', pts: [[638, 569], [645, 628], [543, 640], [536, 581]] },
+    { lots: '27-30', addr: '6752–6758 Meadowsweet Ln', pts: [[741, 503], [779, 556], [694, 616], [656, 564]] },
+    { lots: '31-34', addr: '6808–6814 Meadowsweet Ln', pts: [[858, 415], [899, 465], [808, 539], [767, 489]] },
+    { lots: '35-38', addr: '6822–6828 Meadowsweet Ln', pts: [[990, 320], [996, 380], [895, 390], [889, 331]] },
+    { lots: '39-42', addr: '6834–6840 Meadowsweet Ln', pts: [[1078, 151], [1097, 248], [1038, 260], [1019, 163]] },
+    { lots: '43-46', addr: '23500–23506 W 69th Terrace', pts: [[1408, 124], [1410, 219], [1350, 220], [1347, 126]] },
+    { lots: '47-50', addr: '23512–23516 W 69th Terrace', pts: [[1353, 246], [1414, 258], [1396, 353], [1335, 341]] },
+    { lots: '51-54', addr: '23522–23528 W 69th Terrace', pts: [[1298, 349], [1352, 378], [1305, 467], [1250, 438]] },
+    { lots: '55-56', addr: '23534–23536 W 69th Terrace', pts: [[1217, 464], [1275, 467], [1272, 527], [1214, 524]] },
+    { lots: '57-60', addr: '23531–23537 W 69th Terrace', pts: [[1486, 596], [1505, 657], [1404, 689], [1385, 628]] },
+    { lots: 'Clubhouse', addr: '6835 Meadowsweet Ln', pts: [[599, 259], [644, 259], [644, 310], [599, 310]] }
+  ];
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const sv = (tag, attrs) => { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+  const rows = (id) => { const d = dash.data(id); return d.status === 'ok' ? d.data : []; };
+  const asDate = (s) => new Date(String(s).slice(0, 10) + 'T00:00:00Z');
+  const fmtCache = {};
+  const fmt = (opts) => (s) => { const k = JSON.stringify(opts); fmtCache[k] = fmtCache[k] || new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', ...opts }); return s ? fmtCache[k].format(asDate(s)) : ''; };
+  const md = fmt({ month: 'short', day: 'numeric' });
+  const mdy = fmt({ month: 'short', day: 'numeric', year: 'numeric' });
+  const wmd = fmt({ weekday: 'short', month: 'short', day: 'numeric' });
+  const longDay = fmt({ weekday: 'long', month: 'long', day: 'numeric' });
+  const weekday = fmt({ weekday: 'long' });
+  const todayISO = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const dayDiff = (a, b) => Math.round((asDate(a) - asDate(b)) / 864e5);
+  // the PDF is read days later, so it never says "today" or "tomorrow"
+  const PRINT = matchMedia('print').matches;
+  const relDay = (s) => {
+    const d = dayDiff(s, todayISO);
+    if (PRINT) return d >= 0 && d < 7 ? weekday(s) : null;
+    if (d === 0) return 'Today'; if (d === 1) return 'Tomorrow'; if (d === -1) return 'Yesterday';
+    if (d > 1 && d < 7) return weekday(s);
+    if (d < -1 && d > -7) return 'Last ' + weekday(s);
+    return null;
+  };
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const lotKey = (b) => String(b).replace(/^Lots?\s*/, '');
+  const lotNum = (b) => Number((String(b).match(/\d+/) || [0])[0]);
+  const stageColor = (i) => i >= 6 ? 'var(--st-done)' : i >= 2 ? 'var(--st-build)' : i === 1 ? 'var(--st-permit)' : 'var(--st-plans)';
+  const PLAN_FILL = (i) => i >= 6 ? '#1f3a5f' : i >= 2 ? '#7b3fb3' : i === 1 ? '#2f7bd0' : '#7d868c';
+  const splitLot = (t) => { const m = String(t).match(/^([^:]{2,28}):\s*(.*)$/); return m ? [m[1], m[2]] : [null, String(t)]; };
+  const lotLine = (scope, text) => { const s = el('span'); if (scope) s.append(el('span', 'lot', scope + ' · ')); s.append(document.createTextNode(text)); return s; };
+  const covers = (scope, building, type) => {
+    const s = String(scope);
+    if (/all fourplexes/i.test(s)) return type === 'Fourplex';
+    const m = s.match(/(\d+)\s*-\s*(\d+)/), b = String(building).match(/(\d+)\s*-\s*(\d+)/);
+    return !!(m && b && +b[1] >= +m[1] && +b[2] <= +m[2]);
+  };
+  const phaseInfo = (building) => {
+    const sched = rows('schedule').filter(r => r.building === building);
+    const list = PHASES.map(p => {
+      const r = sched.find(x => x.phase === p) || {};
+      return { phase: p, status: r.actual_end ? 'done' : r.actual_start ? 'now' : 'wait', ...r };
+    });
+    const pct = Math.round(list.reduce((s, p) => s + (p.status === 'done' ? WEIGHT[p.phase] : p.status === 'now' ? WEIGHT[p.phase] / 2 : 0), 0));
+    return { list, pct };
+  };
+  const phaseText = (p) => {
+    const out = [];
+    if (p.status === 'done') out.push(`Done ${md(p.actual_end)}`, `started ${md(p.actual_start)}`);
+    else if (p.status === 'now') { out.push(`Started ${md(p.actual_start)}`); if (p.planned_end) out.push(`target finish ${md(p.planned_end)}`); }
+    else { out.push(p.planned_start ? `Target start ${md(p.planned_start)}` : 'Not started'); if (p.planned_end) out.push(`target finish ${md(p.planned_end)}`); }
+    let late = false;
+    if (p.actual_start && p.planned_start) { const dd = dayDiff(p.actual_start, p.planned_start); late = dd > 0; out.push(dd === 0 ? 'on target' : dd > 0 ? `${plural(dd, 'day')} after target` : `${plural(-dd, 'day')} early`); }
+    return { text: out.join(' · '), note: p.note || '', late };
+  };
+  const phaseBar = (list) => {
+    const wrap = el('div'), bar = el('div', 'hc-phases'), lbl = el('div', 'hc-phase-lbl');
+    list.forEach(p => { bar.append(el('span', p.status === 'wait' ? '' : p.status)); lbl.append(el('span', p.status === 'now' ? 'now' : '', p.phase)); });
+    bar.setAttribute('aria-hidden', 'true'); wrap.append(bar, lbl); return wrap;
+  };
+
+  const buildings = rows('buildings').slice().sort((a, b) => lotNum(a.building) - lotNum(b.building));
+  const byLots = new Map(buildings.map(r => [lotKey(r.building), r]));
+  const upcoming = rows('upcoming').slice().sort((a, b) => (a.when || '9999').localeCompare(b.when || '9999'));
+  let photos = [], photosReady = false;
+
+  // ---------- header ----------
+  (function () {
+    const t = $('hc-updated'), d = new Date(t.getAttribute('datetime'));
+    if (isNaN(d)) { t.parentNode.hidden = true; return; }
+    const day = d.toLocaleDateString('en-US', { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric' });
+    const time = d.toLocaleTimeString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit' });
+    t.textContent = `${day} at ${time} Central`;
+  })();
+  $('hc-share').addEventListener('click', async () => {
+    const b = $('hc-share');
+    const data = { title: 'Hidden Creek Reserve construction update', url: SITE };
+    try { if (navigator.share) { await navigator.share(data); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(SITE); b.textContent = 'Link copied'; }
+    catch (e) { b.textContent = SITE; }
+    setTimeout(() => { b.textContent = 'Share this page'; }, 2500);
+  });
+
+  // ---------- latest from the site ----------
+  const latest = rows('latest');
+  const head = latest.find(r => r.kind === 'headline');
+  $('takeaway').textContent = head ? head.text : '';
+  $('today-date').textContent = head ? longDay(head.date) : '—';
+  $('today-rel').textContent = head ? (relDay(head.date) || '') : '';
+  latest.filter(r => r.kind === 'point').sort((x, y) => Number(x.order) - Number(y.order)).forEach(r => {
+    const [lot, rest] = splitLot(r.text); const li = el('li'); li.append(lotLine(lot, rest)); $('today-list').append(li);
+  });
+
+  // ---------- stats ----------
+  const active = buildings.filter(r => Number(r.stage_index) >= 2 && Number(r.stage_index) < 6);
+  const homes = active.reduce((s, r) => s + Number(r.units || 0), 0);
+  $('k-homes').textContent = String(homes);
+  const stagesNow = [...new Set(active.map(r => r.stage))];
+  $('k-homes-note').textContent = active.length ? `in ${plural(active.length, 'building')}` + (stagesNow.length === 1 && active.length > 1 ? `, all at the ${stagesNow[0].toLowerCase()} stage` : '') : 'work starts soon';
+  const next = upcoming.find(u => u.when && u.when >= todayISO);
+  if (next) {
+    $('k-next').textContent = md(next.when);
+    $('k-next-lbl').textContent = next.item.replace(/\s*\((target|planned)\)\s*$/i, '');
+    $('k-next-note').textContent = [next.scope, (relDay(next.when) || weekday(next.when)).toLowerCase()].filter(Boolean).join(', ');
+  } else { $('k-next').textContent = '—'; $('k-next-note').textContent = 'dates to be set'; }
+
+  // ---------- weekly recap ----------
+  const rc = rows('recap'), sum = rc.find(r => r.kind === 'summary'), weekOf = (sum || rc[0] || {}).week_of;
+  $('recap-week').textContent = weekOf ? 'Week of ' + fmt({ month: 'long', day: 'numeric', year: 'numeric' })(weekOf) : '';
+  $('recap-sum').textContent = sum ? sum.text : ''; $('recap-sum').hidden = !sum;
+  [['this', 'recap-this'], ['next', 'recap-next']].forEach(([k, id]) => {
+    const items = rc.filter(r => r.kind === k);
+    if (!items.length) $(id).append(el('li', 'muted', 'Nothing listed yet.'));
+    items.forEach(r => { const li = el('li'); li.append(lotLine(r.scope, r.text)); $(id).append(li); });
+  });
+  const recapText = () => {
+    const line = (r) => `- ${r.scope ? r.scope + ': ' : ''}${r.text}`;
+    const out = [`Hidden Creek Reserve construction update${weekOf ? ', week of ' + fmt({ month: 'long', day: 'numeric', year: 'numeric' })(weekOf) : ''}`, ''];
+    if (sum) out.push(sum.text, '');
+    out.push('This week', ...rc.filter(r => r.kind === 'this').map(line), '', 'Next week', ...rc.filter(r => r.kind === 'next').map(line), '', 'Where each building stands');
+    buildings.forEach(b => out.push(`- ${b.building} (${String(b.type).toLowerCase()}): ${b.stage}`));
+    out.push('', 'Progress page with photos and schedule: ' + SITE, 'PDF version: ' + SITE + 'recap.pdf');
+    return out.join('\n');
+  };
+  $('recap-copy').addEventListener('click', () => {
+    const txt = recapText(), ta = $('recap-text'), msg = $('recap-copied');
+    const fallback = () => { ta.value = txt; ta.hidden = false; ta.focus(); ta.select(); msg.textContent = 'Select all and copy the text below.'; };
+    try { navigator.clipboard.writeText(txt).then(() => { msg.textContent = 'Copied. Paste it into an email.'; ta.hidden = true; }, fallback); } catch (e) { fallback(); }
+  });
+
+  // ---------- site plan ----------
+  const svg = $('hc-overlay'), tip = $('hc-tip'), map = $('hc-map');
+  if (window.HC_PLAT) $('hc-plat').setAttribute('href', window.HC_PLAT);
+  const blds = $('hc-blds');
+  const FULL = [0, 0, 1550, 770];
+  const ACTIVE = (() => {
+    const pts = LAYOUT.filter(bd => byLots.has(bd.lots)).flatMap(bd => bd.pts);
+    if (!pts.length) return FULL;
+    let x0 = Math.min(...pts.map(p => p[0])), x1 = Math.max(...pts.map(p => p[0])), y0 = Math.min(...pts.map(p => p[1])), y1 = Math.max(...pts.map(p => p[1]));
+    const pad = 70; x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+    // keep a pleasant shape: no taller than 4:3, no wider than the full plan
+    let w = x1 - x0, h = y1 - y0;
+    if (h > w * .78) { const nw = h / .78; x0 -= (nw - w) / 2; w = nw; }
+    if (w > h * 2) { const nh = w / 2; y0 -= (nh - h) / 2; h = nh; }
+    x0 = Math.max(0, Math.min(x0, 1550 - w)); y0 = Math.max(0, Math.min(y0, 770 - h));
+    return [x0, y0, Math.min(w, 1550), Math.min(h, 770)];
+  })();
+  let vb = FULL.slice(), anim = 0;
+  const setVB = (target, instant) => {
+    cancelAnimationFrame(anim);
+    const from = vb.slice(), t0 = performance.now(), dur = instant || matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 450;
+    const step = (now) => {
+      const k = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - k, 3);
+      vb = from.map((v, i) => v + (target[i] - v) * e);
+      svg.setAttribute('viewBox', vb.join(' '));
+      if (k < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  };
+  const setView = (mode, instant) => {
+    $('v-active').setAttribute('aria-pressed', String(mode === 'active'));
+    $('v-all').setAttribute('aria-pressed', String(mode !== 'active'));
+    tip.hidden = true;
+    setVB(mode === 'active' ? ACTIVE : FULL, instant);
+  };
+  $('v-active').onclick = () => setView('active');
+  $('v-all').onclick = () => setView('all');
+  setView(matchMedia('(min-width: 900px)').matches ? 'all' : 'active', true);
+
+  const showTip = (bd, r, ev) => {
+    if (!matchMedia('(hover: hover)').matches) return;
+    tip.textContent = '';
+    tip.append(el('b', null, r ? `${r.building} · ${r.stage}` : (bd.lots === 'Clubhouse' ? 'Clubhouse' : `Lots ${bd.lots} · not yet started`)), el('span', 'ad', bd.addr));
+    if (r) tip.append(el('span', null, r.latest));
+    tip.hidden = false;
+    const box = map.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    let x, y;
+    if (ev && ev.clientX != null) { x = ev.clientX - box.left; y = ev.clientY - box.top; }
+    else { const cx = bd.pts.reduce((s, p) => s + p[0], 0) / 4, cy = bd.pts.reduce((s, p) => s + p[1], 0) / 4; x = (cx - vb[0]) / vb[2] * box.width; y = (cy - vb[1]) / vb[3] * box.height; }
+    tip.style.left = Math.max(6, Math.min(x + 14, box.width - w - 6)) + 'px';
+    tip.style.top = Math.max(6, Math.min(y + 14, box.height - h - 6)) + 'px';
+  };
+  LAYOUT.forEach(bd => {
+    if (dash.hidden.includes('Lots ' + bd.lots)) { bd.hidden = true; }
+    const r = byLots.get(bd.lots), idx = r ? Number(r.stage_index) : -1;
+    const name = r ? r.building : bd.lots === 'Clubhouse' ? 'Clubhouse' : 'Lots ' + bd.lots;
+    const g = sv('g', { class: 'bg', 'data-lots': bd.lots, role: 'button', tabindex: r ? 0 : -1, 'aria-label': r ? `${name}: ${r.stage}. Open details` : `${name}, not yet started` });
+    const pts = bd.pts.map(p => p.join(',')).join(' ');
+    const poly = sv('polygon', { points: pts, class: 'bl' + (r ? '' : ' future') });
+    if (r) poly.style.fill = PLAN_FILL(idx);
+    g.append(poly);
+    if (r && idx >= 2 && idx < 6) g.append(sv('polygon', { points: pts, class: 'pulse' }));
+    if (/^\d+-\d+$/.test(bd.lots)) {
+      const cx = bd.pts.reduce((s, p) => s + p[0], 0) / 4, cy = bd.pts.reduce((s, p) => s + p[1], 0) / 4;
+      const t = sv('text', { class: 'lb' + (r ? '' : ' un'), x: cx, y: cy + 6, 'text-anchor': 'middle' }); t.textContent = bd.lots; g.append(t);
+    }
+    g.addEventListener('mousemove', (ev) => showTip(bd, r, ev));
+    g.addEventListener('mouseleave', () => { tip.hidden = true; });
+    g.addEventListener('blur', () => { tip.hidden = true; });
+    g.addEventListener('focus', () => showTip(bd, r));
+    const open = () => { tip.hidden = true; if (r) openSheet(r.building); else openFuture(bd); };
+    g.addEventListener('click', open);
+    g.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); open(); } });
+    blds.append(g);
+  });
+  [['Plans', '#7d868c'], ['Permitted', '#2f7bd0'], ['Under construction', '#7b3fb3'], ['Complete', '#1f3a5f'], ['Not yet started', null]].forEach(([t, c]) => {
+    const sp = el('span'), i = el('i');
+    if (c) i.style.background = c; else { i.style.background = 'transparent'; i.style.border = '1px solid var(--muted)'; }
+    sp.append(i, document.createTextNode(t)); $('hc-legend').append(sp);
+  });
+
+  // ---------- building cards ----------
+  const cards = $('bldg-cards');
+  buildings.forEach(r => {
+    const idx = Number(r.stage_index);
+    const card = el('article', 'hc-bldg'); card.id = 'b-' + lotKey(r.building);
+    card.style.setProperty('--stage', stageColor(idx));
+    card.tabIndex = 0; card.setAttribute('role', 'button'); card.setAttribute('aria-label', `${r.building}, ${r.stage}. Open details`);
+    const cover = el('div', 'cover'); cover.hidden = true;
+    const body = el('div', 'body');
+    const top = el('div', 'top'), id = el('div');
+    id.append(el('div', 'name', r.building), el('div', 'addr', `${r.type} · ${r.units} homes · ${r.addresses}`));
+    top.append(id, el('span', 'hc-pill', r.stage));
+    body.append(top);
+    if (r.type === 'Fourplex') {
+      const { list, pct } = phaseInfo(r.building);
+      const p = el('div'), pl = el('div', 'hc-pct'); pl.append(el('span', null, 'Progress'), el('span', 'num', `about ${pct}%`));
+      p.append(pl, phaseBar(list)); body.append(p);
+    }
+    body.append(el('p', 'latest', r.latest));
+    const foot = el('div', 'foot'); foot.append(el('span', null, 'Updated ' + mdy(r.as_of)), el('span', 'more', 'Details ›'));
+    body.append(foot);
+    card.append(cover, body);
+    const open = () => openSheet(r.building);
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); open(); } });
+    cards.append(card);
+  });
+
+  // ---------- schedule ----------
+  const fourplexes = buildings.filter(b => b.type === 'Fourplex');
+  const tbl = $('sched-table'), list = $('sched-list');
+  const thead = el('thead'), hr = el('tr'); hr.append(el('th', null, 'Building'));
+  PHASES.forEach(p => hr.append(el('th', null, p))); thead.append(hr); tbl.append(thead);
+  const tb = el('tbody');
+  fourplexes.forEach(b => {
+    const { list: ph, pct } = phaseInfo(b.building);
+    const tr = el('tr'), th = el('th'); th.scope = 'row';
+    th.append(document.createTextNode(b.building), el('span', 'pct', `about ${pct}% complete`));
+    const bar = el('div', 'bar'), fill = el('i'); fill.style.width = pct + '%'; bar.append(fill); th.append(bar); tr.append(th);
+    ph.forEach(p => {
+      const td = el('td'), c = el('div', 'hc-cell ' + p.status);
+      if (p.status === 'done') c.append(el('span', 's', 'Done ' + md(p.actual_end)), el('span', 'd', 'Started ' + md(p.actual_start)));
+      else if (p.status === 'now') { c.append(el('span', 's', 'In progress'), el('span', 'd', 'Started ' + md(p.actual_start))); if (p.planned_end) c.append(el('span', 'd', 'Target finish ' + md(p.planned_end))); }
+      else { c.append(el('span', 's', p.planned_start ? 'Target start ' + md(p.planned_start) : 'Not started')); if (p.planned_end) c.append(el('span', 'd', 'Target finish ' + md(p.planned_end))); }
+      if (p.actual_start && p.planned_start) { const dd = dayDiff(p.actual_start, p.planned_start); c.append(el('span', 'd' + (dd > 0 ? ' late' : ''), dd === 0 ? 'Started on target' : dd > 0 ? `Started ${plural(dd, 'day')} after target` : `Started ${plural(-dd, 'day')} early`)); }
+      if (p.note) c.append(el('span', 'd', p.note));
+      td.append(c); tr.append(td);
+    });
+    tb.append(tr);
+    // phone version
+    const card = el('div', 'hc-sl'), h = el('div', 'h');
+    h.append(el('b', null, b.building), el('span', 'muted num', `about ${pct}% complete`));
+    card.append(h, phaseBar(ph));
+    const det = el('ul', 'hc-sl-det');
+    ph.filter(p => p.status !== 'wait').forEach(p => { const { text, note, late } = phaseText(p); const li = el('li', p.status); li.append(el('b', null, p.phase), el('span', late ? 'late' : '', [text, note].filter(Boolean).join(' · '))); det.append(li); });
+    const nxt = ph.find(p => p.status === 'wait');
+    if (nxt) { const li = el('li', 'wait'); li.append(el('b', null, 'Up next'), el('span', null, nxt.phase + (nxt.planned_start ? ', target start ' + md(nxt.planned_start) : ''))); det.append(li); }
+    card.append(det); list.append(card);
+  });
+  tbl.append(tb);
+  function steps(ph) {
+    const ol = el('ol', 'hc-steps');
+    ph.forEach(p => {
+      const li = el('li', p.status), info = el('div'), { text, note, late } = phaseText(p);
+      li.append(el('span', 'dot'));
+      info.append(el('span', 't', p.phase), el('span', 'd' + (late ? ' late' : ''), text));
+      if (note) info.append(el('span', 'd', note));
+      li.append(info); ol.append(li);
+    });
+    return ol;
+  }
+
+  // ---------- coming up ----------
+  (function () {
+    const box = $('upcoming-list');
+    if (!upcoming.length) { box.append(el('p', 'muted', 'Nothing scheduled yet.')); return; }
+    const groups = new Map();
+    upcoming.forEach(u => { const k = u.when || ''; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(u); });
+    groups.forEach((items, k) => {
+      const d = el('div', 'ag-day'), dt = el('div', 'ag-date');
+      if (k) {
+        const rel = relDay(k), diff = dayDiff(k, todayISO);
+        if (diff >= 0 && diff <= 1) d.classList.add('soon');
+        if (diff < 0) d.classList.add('past');
+        dt.append(el('b', null, rel || weekday(k)), el('span', null, /^(Today|Tomorrow|Yesterday)$/.test(rel || '') ? wmd(k) : md(k)));
+      } else dt.append(el('b', null, 'Date to be set'), el('span', null, 'when crews confirm'));
+      const ul = el('ul');
+      items.forEach(u => { const li = el('li'); li.append(el('span', 'lot', u.scope), document.createTextNode(u.item)); ul.append(li); });
+      d.append(dt, ul); box.append(d);
+    });
+  })();
+
+  // ---------- section tabs ----------
+  (function () {
+    const bar = $('hc-bar'), tabs = [...document.querySelectorAll('#hc-tabs a')];
+    const secs = tabs.map(a => document.querySelector(a.getAttribute('href')));
+    const onScroll = () => {
+      bar.classList.toggle('stuck', window.scrollY > 40);
+      const y = window.scrollY + window.innerHeight * .3;
+      let cur = 0; secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top + window.scrollY <= y) cur = i; });
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = secs.length - 1;
+      tabs.forEach((a, i) => {
+        const on = i === cur;
+        if (on && a.getAttribute('aria-current') !== 'true') { const nav = $('hc-tabs'); nav.scrollTo({ left: a.offsetLeft - nav.clientWidth / 2 + a.clientWidth / 2, behavior: 'smooth' }); }
+        a.setAttribute('aria-current', String(on));
+      });
+    };
+    let ticking = false;
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; onScroll(); }); } }, { passive: true });
+    onScroll();
+  })();
+
+  // ---------- photo viewer ----------
+  const lb = $('hc-lightbox'), lbImg = $('lb-img');
+  let lbList = [], lbIdx = 0;
+  const lbShow = (dir) => {
+    const p = lbList[lbIdx]; if (!p) return;
+    lbImg.style.transition = 'none'; lbImg.style.transform = dir ? `translateX(${dir * 40}px)` : ''; lbImg.style.opacity = dir ? '0' : '1';
+    lbImg.src = p.src; lbImg.alt = p.caption || `${p.building} on ${md(p.date)}`;
+    requestAnimationFrame(() => { lbImg.style.transition = ''; lbImg.style.transform = ''; lbImg.style.opacity = '1'; });
+    $('lb-count').textContent = `${lbIdx + 1} of ${lbList.length}`;
+    const cap = $('lb-cap'); cap.textContent = '';
+    if (p.caption) cap.append(document.createTextNode(p.caption));
+    cap.append(el('span', 'm', `${p.building} · ${mdy(p.date)}`));
+    $('lb-prev').disabled = lbIdx === 0; $('lb-next').disabled = lbIdx === lbList.length - 1;
+  };
+  const lbGo = (d) => { const n = lbIdx + d; if (n < 0 || n >= lbList.length) { lbImg.style.transform = `translateX(${-d * 18}px)`; setTimeout(() => { lbImg.style.transform = ''; }, 180); return; } lbIdx = n; lbShow(d); };
+  const openLb = (l, i) => { lbList = l; lbIdx = i; lbShow(0); try { lb.showModal(); } catch (e) { lb.setAttribute('open', ''); } };
+  $('lb-prev').onclick = () => lbGo(-1); $('lb-next').onclick = () => lbGo(1); $('lb-close').onclick = () => lb.close();
+  lb.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') lbGo(-1); if (e.key === 'ArrowRight') lbGo(1); });
+  (function () {
+    const st = $('lb-stage'); let x0 = null, y0 = 0, dx = 0, multi = false;
+    st.addEventListener('touchstart', (e) => { multi = e.touches.length > 1; if (multi) return; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; lbImg.style.transition = 'none'; }, { passive: true });
+    st.addEventListener('touchmove', (e) => { if (x0 == null || multi || e.touches.length > 1) { multi = true; return; } dx = e.touches[0].clientX - x0; const dy = e.touches[0].clientY - y0; if (Math.abs(dx) > Math.abs(dy)) lbImg.style.transform = `translateX(${dx}px)`; else lbImg.style.transform = `translateY(${Math.max(0, dy)}px)`; lbImg.dataset.dy = dy; }, { passive: true });
+    st.addEventListener('touchend', () => {
+      if (x0 == null || multi) { x0 = null; return; }
+      lbImg.style.transition = ''; const dy = Number(lbImg.dataset.dy || 0); lbImg.dataset.dy = 0; x0 = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) lbGo(dx < 0 ? 1 : -1);
+      else if (dy > 110) { lbImg.style.transform = ''; lb.close(); }
+      else lbImg.style.transform = '';
+    });
+    st.addEventListener('click', (e) => { if (e.target === st) lb.close(); });
+  })();
+  const thumb = (p, l, i) => {
+    const b = el('button'); b.type = 'button'; b.setAttribute('aria-label', `Open photo: ${p.building}, ${md(p.date)}`);
+    const img = el('img'); img.src = p.src; img.alt = p.caption || `${p.building} on ${md(p.date)}`; img.loading = 'lazy'; img.decoding = 'async';
+    b.append(img); b.onclick = (e) => { e.stopPropagation(); openLb(l, i); }; return b;
+  };
+
+  // ---------- building sheet ----------
+  const sheet = $('hc-sheet');
+  let sheetFor = null;
+  const closeSheet = () => {
+    if (!sheet.open) return;
+    sheet.close();
+  };
+  sheet.addEventListener('close', () => { sheetFor = null; document.querySelectorAll('#hc-blds .bg.sel').forEach(g => g.classList.remove('sel')); if (location.hash.startsWith('#b-')) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } });
+  sheet.addEventListener('click', (e) => { if (e.target === sheet) closeSheet(); });
+  const sheetHead = (name, pill, addr, idx) => {
+    const h = el('div', 's-head'); h.append(el('div', 'grab'));
+    const row = el('div', 's-row'), id = el('div'), nm = el('div', 's-name'); nm.id = 's-name';
+    nm.append(document.createTextNode(name)); const pl = el('span', 'hc-pill', pill); pl.style.setProperty('--stage', stageColor(idx)); nm.append(pl);
+    id.append(nm, el('div', 's-addr', addr));
+    const x = el('button', 's-close', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.onclick = closeSheet;
+    row.append(id, x); h.append(row);
+    // drag down to close on phones
+    let y0 = null, dy = 0;
+    h.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; dy = 0; sheet.style.transition = 'none'; }, { passive: true });
+    h.addEventListener('touchmove', (e) => { if (y0 == null) return; dy = Math.max(0, e.touches[0].clientY - y0); sheet.style.transform = `translateY(${dy}px)`; }, { passive: true });
+    h.addEventListener('touchend', () => { sheet.style.transition = 'transform .2s'; if (dy > 90) { sheet.style.transform = 'translateY(100%)'; setTimeout(() => { closeSheet(); sheet.style.transform = ''; sheet.style.transition = ''; }, 180); } else { sheet.style.transform = ''; } y0 = null; });
+    return h;
+  };
+  const showSheet = () => { sheet.scrollTop = 0; if (!sheet.open) { try { sheet.showModal(); } catch (e) { sheet.setAttribute('open', ''); } } const b = sheet.querySelector('.s-body'); if (b) b.scrollTop = 0; };
+  const markSel = (lots) => document.querySelectorAll('#hc-blds .bg').forEach(g => g.classList.toggle('sel', g.dataset.lots === lots));
+  function openSheet(building) {
+    const r = buildings.find(b => b.building === building); if (!r) return;
+    sheetFor = building; markSel(lotKey(building));
+    const idx = Number(r.stage_index);
+    sheet.textContent = '';
+    sheet.append(sheetHead(r.building, r.stage, `${r.type} · ${r.units} homes · ${r.addresses}`, idx));
+    const body = el('div', 's-body');
+    const s1 = el('div'); s1.append(el('h3', null, 'Latest'), el('p', null, r.latest), el('div', 'asof', 'Updated ' + mdy(r.as_of)));
+    body.append(s1);
+    const own = photos.filter(p => p.building === r.building);
+    const s3 = el('div'); s3.append(el('h3', null, own.length ? `Photos · ${own.length}` : 'Photos'));
+    if (own.length) { const g = el('div', 'thumbs'); own.forEach((p, i) => g.append(thumb(p, own, i))); s3.append(g); }
+    else s3.append(el('p', 'empty', photosReady ? 'No photos of this building yet.' : 'Photos are loading…'));
+    body.append(s3);
+    if (r.type === 'Fourplex') {
+      const { list: ph, pct } = phaseInfo(r.building);
+      const s2 = el('div'); s2.append(el('h3', null, `Progress · about ${pct}% complete`), steps(ph)); body.append(s2);
+    }
+    const up = upcoming.filter(u => covers(u.scope, r.building, r.type) || u.scope === r.building);
+    if (up.length) {
+      const s4 = el('div'), ul = el('ul', 'up'); s4.append(el('h3', null, 'Coming up'));
+      up.forEach(u => { const li = el('li'); li.append(el('span', 'dt', u.when ? (relDay(u.when) && dayDiff(u.when, todayISO) >= 0 && dayDiff(u.when, todayISO) <= 1 ? relDay(u.when) : wmd(u.when).replace(/^\w+, /, '')) : 'TBD'), el('span', null, u.item)); ul.append(li); });
+      s4.append(ul); body.append(s4);
+    }
+    // previous / next building
+    const i = buildings.indexOf(r), nav = el('div', 's-nav');
+    const mk = (b, label) => { const x = el('button', 'hc-btn', label); x.type = 'button'; if (!b) { x.disabled = true; x.style.visibility = 'hidden'; } else x.onclick = () => openSheet(b.building); return x; };
+    nav.append(mk(buildings[i - 1], buildings[i - 1] ? '‹ ' + buildings[i - 1].building : ''), mk(buildings[i + 1], buildings[i + 1] ? buildings[i + 1].building + ' ›' : ''));
+    body.append(nav);
+    sheet.append(body);
+    showSheet();
+    try { history.replaceState(null, '', '#b-' + lotKey(r.building)); } catch (e) {}
+  }
+  function openFuture(bd) {
+    sheetFor = bd.lots; markSel(bd.lots);
+    sheet.textContent = '';
+    const name = bd.lots === 'Clubhouse' ? 'Clubhouse' : 'Lots ' + bd.lots;
+    sheet.append(sheetHead(name, 'Not yet started', bd.addr, 0));
+    const body = el('div', 's-body');
+    body.append(el('p', 'empty', bd.lots === 'Clubhouse' ? 'The clubhouse is planned for a later phase.' : 'Work on this building has not started yet.'));
+    sheet.append(body); showSheet();
+  }
+  window.hcDetail = (bd, r) => r ? openSheet(r.building) : openFuture(bd);
+
+  // ---------- photos (their data sits at the end of the page so text shows first) ----------
+  let photoFilter = 'All', showAll = false;
+  const PHONE_LIMIT = matchMedia('(min-width: 640px)').matches ? 12 : 8;
+  function renderPhotos() {
+    const chips = $('photo-chips'), grid = $('photo-grid'), more = $('photo-more');
+    chips.textContent = ''; grid.textContent = ''; more.hidden = true;
+    if (!photos.length) {
+      chips.hidden = true; $('photo-sub').textContent = 'Added each week';
+      const e = el('div', 'hc-empty'); e.append(el('b', null, 'Photos from the site start soon'), el('span', null, 'Weekly jobsite photos for each building will appear here as work moves along.'));
+      grid.append(e); return;
+    }
+    chips.hidden = false;
+    const groups = ['All', ...[...new Set(photos.map(p => p.building))].sort((a, b) => lotNum(a) - lotNum(b))];
+    if (!groups.includes(photoFilter)) photoFilter = 'All';
+    groups.forEach(g => {
+      const n = g === 'All' ? photos.length : photos.filter(p => p.building === g).length;
+      const c = el('button', 'hc-chip'); c.type = 'button'; c.setAttribute('aria-pressed', String(g === photoFilter));
+      c.append(document.createTextNode(g + ' '), el('span', 'n', String(n)));
+      c.onclick = () => { photoFilter = g; showAll = false; renderPhotos(); };
+      chips.append(c);
+    });
+    const l = photoFilter === 'All' ? photos : photos.filter(p => p.building === photoFilter);
+    $('photo-sub').textContent = `${plural(l.length, 'photo')}, newest first`;
+    const limit = showAll ? l.length : PHONE_LIMIT;
+    l.forEach((p, i) => {
+      const f = el('figure', 'hc-ph'); f.append(thumb(p, l, i));
+      const cap = el('figcaption'); if (p.caption) cap.append(document.createTextNode(p.caption));
+      cap.append(el('span', 'm', `${p.building} · ${md(p.date)}`)); f.append(cap);
+      if (i >= limit) f.hidden = true;
+      grid.append(f);
+    });
+    if (l.length > limit) { more.hidden = false; $('photo-more-btn').textContent = `Show all ${l.length} photos`; }
+  }
+  $('photo-more-btn').onclick = () => { showAll = true; renderPhotos(); };
+  function renderCovers() {
+    buildings.forEach(r => {
+      const own = photos.filter(p => p.building === r.building), card = $('b-' + lotKey(r.building));
+      if (!card || !own.length) return;
+      const cv = card.querySelector('.cover'); cv.textContent = '';
+      const img = el('img'); img.src = own[0].src; img.alt = `${r.building}, ${md(own[0].date)}`; img.decoding = 'async';
+      cv.append(img, el('span', 'n', plural(own.length, 'photo'))); cv.hidden = false;
+    });
+  }
+  function loadPhotos() {
+    if (photosReady) return;
+    const blk = $('hc-photos'); if (!blk) return;
+    try { photos = JSON.parse(blk.textContent) || []; } catch (e) { photos = []; }
+    photos = photos.filter(p => !dash.hidden.includes(p.building));
+    photos.sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(a.file).localeCompare(String(b.file)));
+    photosReady = true;
+    renderPhotos(); renderCovers();
+    if (sheet.open && sheetFor && byLots.has(lotKey(sheetFor))) openSheet(sheetFor);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadPhotos); else loadPhotos();
+  window.hcLoadPhotos = loadPhotos;
+
+  // open a building from a shared link like #b-11-14
+  const openFromHash = () => { const m = location.hash.match(/^#b-(\d+-\d+)$/); if (m && byLots.has(m[1])) openSheet(byLots.get(m[1]).building); };
+  window.addEventListener('hashchange', openFromHash);
+  document.addEventListener('DOMContentLoaded', openFromHash);
+})();
+</script>
+<script type="application/json" id="hc-photos">{{PHOTOS}}</script>
+<script>window.hcLoadPhotos && window.hcLoadPhotos();</script>
