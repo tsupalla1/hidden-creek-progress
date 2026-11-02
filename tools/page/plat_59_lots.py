@@ -49,3 +49,18 @@ for (cx, cy), s in [((1328.75, 383.75), '50'), ((1318.25, 405.5), '51'), ((1307.
     erase(cx, cy)
     write(cx, cy, s)
 im.save(out)
+
+# The triplex's middle unit (48) inherited two back patios from the fourplex drawing; leave it one, centered on the unit.
+im = Image.open(out).convert('RGB'); px = im.load()
+edge = lambda y: 1353.25 - (y - 246.25) * (23.25 / 95.75)
+# copy unit 47's patio (untouched) as the sprite: every non-grass pixel left of the wall
+sprite = {(x, y - 260): px[x, y] for x in range(1334, 1352) for y in range(251, 270)
+          if x < edge(y) - 1.2 and not (px[x, y][1] > px[x, y][0] + 12)}
+for y in range(276, 309):
+    for x in range(1327, 1346):
+        if x < edge(y) - 1.2:
+            px[x, y] = px[x - 16, y]
+cy = 294; dx = round(edge(cy) - edge(260))
+for (x, oy), c in sprite.items():
+    px[x + dx, cy + oy] = c
+im.save(out)
