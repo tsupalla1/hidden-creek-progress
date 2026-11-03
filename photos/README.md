@@ -8,10 +8,14 @@ Drop photos here and the progress page picks them up on the next weekday refresh
 - `photos/lots-15-18/`
 - `photos/lots-19-22/`
 - `photos/lots-23-26/`
+- `photos/lots-27-30/`
+- `photos/lots-31-34/`
+- `photos/lots-35-38/`
+- `photos/lots-39-42/`
 - `photos/lots-9-10/`
 - `photos/site/` for streets, grading and anything not tied to one building
 
-**How, from a phone or computer:** open the folder on github.com, tap **Add file → Upload files**, pick the photos and tap **Commit changes**. A new folder can be made by typing its name before the file name, e.g. `lots-27-30/`.
+**How, from a phone or computer:** open the folder on github.com, tap **Add file → Upload files**, pick the photos and tap **Commit changes**. A new folder can be made by typing its name before the file name, e.g. `lots-43-46/`.
 
 **Dates and captions:** the photo's own camera date is used. To set it yourself, start the file name with the date, and any words after it become the caption: `2026-11-03 framing starts.jpg`.
 
