@@ -14,8 +14,8 @@ Each photo is shrunk to a web-sized WebP and written into the page's
 It also stamps the current time into the page's "Last updated" line.
 
 Each building also gets a photo timeline (shown in its sheet on the page):
-one photo per date, newest first on the page, up to TIMELINE_MAX frames spread evenly
-from the first day to the latest. Those frames are marked "tl": 1. A frame
+every photo from up to TIMELINE_MAX dates spread evenly from the first day to
+the latest, newest first on the page. Those frames are marked "tl": 1. A frame
 that has aged out of the newest MAX_PHOTOS is kept as a small thumbnail
 marked "old": 1, so the timeline still starts at bare dirt; the gallery
 skips old frames.
@@ -136,11 +136,9 @@ def timeline(photos, keep):
             continue
         days = {}
         for p in sorted((p for p in photos if p["building"] == b), key=lambda p: (p["date"], p["file"])):
-            # one frame per day: a captioned photo first, then one already on the page, else the day's first
-            cur = days.get(p["date"])
-            if cur is None or (bool(p["caption"]), p["file"] in kept) > (bool(cur["caption"]), cur["file"] in kept):
-                days[p["date"]] = p
-        for p in spread([days[d] for d in sorted(days)], TIMELINE_MAX):
+            days.setdefault(p["date"], []).append(p)
+        # spread the days evenly; every photo from a chosen day goes on the timeline
+        for p in (p for d in spread(sorted(days), TIMELINE_MAX) for p in days[d]):
             p["tl"] = 1
             if p["file"] not in kept:
                 try:
