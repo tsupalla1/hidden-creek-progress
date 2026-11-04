@@ -40,7 +40,7 @@ MAX_PHOTOS = 48          # newest photos kept on the page
 TIMELINE_MAX = 12        # frames per building on its timeline
 OLD_EDGE = 560           # older timeline frames are kept small
 OLD_QUALITY = 50
-CAMERA_NAME = re.compile(r"^(img|dsc|dscn|pxl|photo|image|mvimg|screenshot)?[\s_-]*\d*$", re.I)
+CAMERA_NAME = re.compile(r"^(img|dsc|dscn|pxl|photo|image|mvimg|screenshot)?[\s_-]*\d*$|\bdcim\b", re.I)
 
 
 def heic_support():
@@ -92,7 +92,7 @@ def caption_for(stem):
     text = re.sub(r"^\d{4}-\d{2}-\d{2}", "", stem)
     text = re.sub(r"[_-]+", " ", text).strip()
     text = re.sub(r"\s*\(\d+\)$", "", text)
-    if not text or CAMERA_NAME.match(text):
+    if not text or CAMERA_NAME.search(text):
         return ""
     return text[0].upper() + text[1:]
 
