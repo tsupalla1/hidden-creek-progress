@@ -11,6 +11,7 @@ Words after the date become the caption ("2026-11-03 framing starts.jpg").
 
 Each photo is shrunk to a web-sized WebP and written into the page's
 <script id="hc-photos"> block, so the page needs no outside image host.
+It then runs tools/videos.py for drone clips in videos/.
 It also stamps the current time into the page's "Last updated" line.
 
 Each building also gets a photo timeline (shown in its sheet on the page):
@@ -182,6 +183,9 @@ def main(page):
     old = sum(1 for p in keep if p.get("old"))
     print(f"{len(keep) - old} photos embedded, plus {old} older timeline frames ({size:.1f} MB); "
           f"{len(photos) - len(keep) + old} older left out of the gallery")
+    # drone videos ride along with every photo run, so the weekday refresh picks them up too
+    import videos
+    videos.main(page)
 
 
 if __name__ == "__main__":
