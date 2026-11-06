@@ -112,6 +112,7 @@ window.dash = (function () {
 .hc-video .yt-poster img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .9; }
 .hc-video .yt-poster span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 4.2rem; height: 4.2rem; border-radius: 50%; background: rgba(0,0,0,.6); display: grid; place-items: center; }
 .hc-video .yt-poster span::after { content: ""; border-style: solid; border-width: .75rem 0 .75rem 1.25rem; border-color: transparent transparent transparent #fff; margin-left: .25rem; }
+@media (min-width: 760px) { .hc-video.older .vid-main, .hc-video.older .vid-cap { max-width: 44rem; } }
 .hc-video .vid-cap { margin: .55rem 0 0; color: var(--muted); font-size: .95rem; }
 .hc-video .vid-cap b { color: var(--color-fg); font-weight: 500; }
 .hc-video .vid-list { display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; margin: .8rem calc(-1 * var(--gutter)) 0; padding: 0 var(--gutter) .2rem; scroll-snap-type: x proximity; }
@@ -804,8 +805,11 @@ window.dash = (function () {
     vids.sort((a, b) => String(b.date).localeCompare(String(a.date)));
     const sec = $('video'); if (!sec || !vids.length) return;
     sec.hidden = false;
+    // fresh footage (today or yesterday) sits near the top; older footage moves below the photos
+    const stale = !vids[0].date || dayDiff(vids[0].date, todayISO) < -1;
+    if (stale && $('photos')) { $('photos').after(sec); sec.classList.add('older'); $('video-sub').textContent = vids[0].date ? `Latest flyover ${md(vids[0].date)}` : 'Drone video of the site'; }
     const tab = el('a', null, 'Drone'); tab.href = '#video';
-    const after = document.querySelector('#hc-tabs a[href="#today"]'); after.after(tab);
+    const after = document.querySelector(stale ? '#hc-tabs a[href="#photos"]' : '#hc-tabs a[href="#today"]'); after.after(tab);
     const main = $('video-main'), cap = $('video-cap'), list = $('video-list');
     const calm = matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator.connection && navigator.connection.saveData);
     let io = null;
@@ -850,7 +854,7 @@ window.dash = (function () {
         list.append(b);
       });
       list.hidden = false;
-      $('video-sub').textContent = plural(vids.length, 'video') + ', newest first';
+      if (!stale) $('video-sub').textContent = plural(vids.length, 'video') + ', newest first';
     }
     show(0);
   })();

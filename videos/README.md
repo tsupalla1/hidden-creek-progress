@@ -1,6 +1,6 @@
 # Drone videos
 
-Drop a drone clip here and it shows near the top of the progress page ("From the air") on the next weekday refresh (5:30pm Central). Until a clip is here, the page shows no video section at all.
+Drop a drone clip here and it shows on the progress page ("From the air") on the next weekday refresh (5:30pm Central): near the top the day it was shot and the day after, then below the jobsite photos once it is older. Until a clip is here, the page shows no video section at all.
 
 **Best clip:** 30 to 60 seconds, MP4 or MOV, straight from the drone is fine. The refresh shrinks it to a phone-friendly size, makes a still frame for the cover, and replaces the original. It plays muted and on a loop when someone scrolls to it, with a play button and full screen.
 
