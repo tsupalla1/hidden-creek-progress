@@ -1,3 +1,4 @@
 # One line per YouTube video: date, caption | link. Lines starting with # are ignored.
 # 2026-11-05 Full site flyover | https://youtu.be/XXXXXXXXXXX
 2026-11-05 Site flyover | https://youtu.be/Wz1lLhElXQs
+2026-11-11 Site flyover | https://youtu.be/5BHxVZ0IQCk
