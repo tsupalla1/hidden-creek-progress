@@ -951,7 +951,7 @@ window.dash = (function () {
     const own = allPhotos.filter(p => p.building === building);
     let tl = own.filter(p => p.tl);
     if (!tl.length) { const days = new Map(); own.forEach(p => { if (!days.has(p.date)) days.set(p.date, p); }); tl = [...days.values()]; }
-    return tl.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)))
+    return tl.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.t || '').localeCompare(String(a.t || '')))
       .map(p => ({ ...p, caption: p.caption || stageOn(building, p.date) }));
   };
   function timelineStrip(tl, own) {
@@ -1063,7 +1063,7 @@ window.dash = (function () {
     const blk = $('hc-photos'); if (!blk) return;
     try { allPhotos = JSON.parse(blk.textContent) || []; } catch (e) { allPhotos = []; }
     allPhotos = allPhotos.filter(p => !dash.hidden.includes(p.building));
-    allPhotos.sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(a.file).localeCompare(String(b.file)));
+    allPhotos.sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.t || '').localeCompare(String(a.t || '')) || String(a.file).localeCompare(String(b.file)));
     photos = allPhotos.filter(p => !p.old);   // older timeline frames stay out of the gallery
     photosReady = true;
     renderPhotos(); renderCovers();

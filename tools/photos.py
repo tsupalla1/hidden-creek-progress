@@ -89,6 +89,17 @@ def commit_date(path):
         return None
 
 
+def added_at(path):
+    """When the photo was uploaded (its first commit), so same-day photos show newest upload first."""
+    try:
+        return subprocess.run(
+            ["git", "log", "--diff-filter=A", "--format=%cI", "-1", "--", str(path)],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout.strip()
+    except Exception:
+        return ""
+
+
 def caption_for(stem):
     text = re.sub(r"^\d{4}-\d{2}-\d{2}", "", stem)
     text = re.sub(r"[_-]+", " ", text).strip()
@@ -117,6 +128,7 @@ def load(path, edge=MAX_EDGE, quality=QUALITY):
         "w": img.width,
         "h": img.height,
         "file": str(path.relative_to(ROOT)),
+        "t": added_at(path),
     }
 
 
@@ -136,7 +148,7 @@ def timeline(photos, keep):
         if b == "Site":
             continue
         days = {}
-        for p in sorted((p for p in photos if p["building"] == b), key=lambda p: (p["date"], p["file"])):
+        for p in sorted((p for p in photos if p["building"] == b), key=lambda p: (p["date"], p.get("t", ""), p["file"])):
             days.setdefault(p["date"], []).append(p)
         # spread the days evenly; every photo from a chosen day goes on the timeline
         for p in (p for d in spread(sorted(days), TIMELINE_MAX) for p in days[d]):
@@ -147,7 +159,7 @@ def timeline(photos, keep):
                 except Exception as e:
                     print(f"skipped timeline {p['file']}: {e}", file=sys.stderr)
                     continue
-                small.update(date=p["date"], tl=1, old=1)
+                small.update(date=p["date"], t=p.get("t", ""), tl=1, old=1)
                 extra.append(small)
     return extra
 
@@ -164,7 +176,7 @@ def main(page):
             photos.append(load(path))
         except Exception as e:
             print(f"skipped {path.relative_to(ROOT)}: {e}", file=sys.stderr)
-    photos.sort(key=lambda p: (p["date"], p["file"]), reverse=True)
+    photos.sort(key=lambda p: (p["date"], p.get("t", ""), p["file"]), reverse=True)
     keep = photos[:MAX_PHOTOS]
     keep += timeline(photos, keep)
     html = Path(page).read_text()
