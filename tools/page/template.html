@@ -136,7 +136,9 @@ window.dash = (function () {
 .hc-recap .sec-head { margin: 0; }
 .hc-recap-sum { font-size: 1.2rem; font-style: italic; margin: 0; max-width: 60ch; }
 .hc-recap-grid { display: grid; grid-template-columns: 1fr; gap: 1.3rem; }
-@media (min-width: 700px) { .hc-recap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2.5rem; } }
+@media (min-width: 900px) { #recap-this { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 2.5rem; } }
+/* "Next week" is covered by Coming up on screen; the PDF and the email text still include it */
+@media screen { .hc-recap-next { display: none; } }
 .hc-recap-grid h3 { margin-bottom: .6rem; }
 .hc-actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; border-top: 1px solid var(--line); padding-top: 1.1rem; }
 .hc-btn { font-size: 1rem; color: var(--creek); background: none; border: 1px solid color-mix(in oklab, var(--creek) 40%, transparent); border-radius: 999px; padding: .45rem 1.1rem; min-height: 2.75rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .45rem; }
@@ -200,17 +202,40 @@ window.dash = (function () {
 .hc-phase-lbl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; font-size: .74rem; color: var(--muted); margin-top: .3rem; }
 .hc-phase-lbl span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hc-phase-lbl span.now { color: var(--color-fg); font-weight: 600; }
-.hc-pct { display: flex; justify-content: space-between; font-size: .88rem; color: var(--muted); margin-bottom: .35rem; }
+.hc-pct { display: flex; justify-content: space-between; gap: .8rem; font-size: .88rem; color: var(--muted); margin-bottom: .35rem; }
+.hc-pct .cur { color: var(--color-fg); text-align: right; }
+.hc-phases.f6, .hc-phase-lbl.f6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.hc-phase-lbl.f6 span { white-space: normal; overflow-wrap: anywhere; line-height: 1.15; }
+.hc-phases > span.now.full::after { inset: 0; }
+.hc-bldg .chev { display: none; }
+.hc-bldg .step { display: none; }
+/* Phones: buildings as a compact list (photo, name, stage, one line of news); the sheet holds the detail */
+@media screen and (max-width: 639px) {
+  .hc-bldgs { gap: .6rem; }
+  .hc-bldg { flex-direction: row; border-radius: 14px; }
+  .hc-bldg:hover { transform: none; }
+  .hc-bldg .cover { flex: none; width: 5.75rem; aspect-ratio: auto; min-height: 100%; }
+  .hc-bldg .cover .n, .hc-bldg .addr, .hc-bldg .foot, .hc-bldg .prog { display: none; }
+  .hc-bldg .body { padding: .7rem 2rem .75rem .85rem; gap: .25rem; min-width: 0; }
+  .hc-bldg .top { gap: .5rem; align-items: baseline; }
+  .hc-bldg .name { font-size: 1.2rem; }
+  .hc-bldg .hc-pill { font-size: .78rem; padding: .05rem .55rem; }
+  .hc-bldg .step { display: block; font-size: .9rem; color: var(--muted); line-height: 1.3; }
+  .hc-bldg .latest { font-size: .95rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .hc-bldg .chev { display: block; position: absolute; right: .8rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 1.4rem; line-height: 1; }
+}
+/* The phase-by-phase grid is for wide screens and the PDF; on phones each building's sheet shows its steps */
+@media screen and (max-width: 899px) { #schedule, .hc-tabs a[href="#schedule"] { display: none !important; } }
 
 /* Schedule: table on wide screens, stacked list on phones */
 .hc-sched-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); display: none; box-shadow: var(--shadow); }
-@media (min-width: 900px) { .hc-sched-wrap { display: block; } .hc-sched-list { display: none !important; } }
+@media (min-width: 900px) { .hc-sched-wrap { display: block; } }
 .hc-sched { width: 100%; border-collapse: collapse; font-size: .95rem; }
 .hc-sched th, .hc-sched td { text-align: left; vertical-align: top; padding: .75rem .7rem; border-bottom: 1px solid var(--line); }
 .hc-sched tr:last-child td, .hc-sched tr:last-child th { border-bottom: none; }
 .hc-sched thead th { font-weight: 500; font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .hc-sched tbody th { font-weight: 500; font-size: 1.1rem; white-space: nowrap; }
-.hc-sched tbody th .pct { display: block; font-weight: 400; font-size: .88rem; color: var(--muted); font-variant-numeric: lining-nums tabular-nums; }
+.hc-sched tbody th .pct { display: block; font-weight: 400; font-size: .88rem; color: var(--muted); font-variant-numeric: lining-nums tabular-nums; white-space: normal; max-width: 9rem; line-height: 1.3; margin-top: .15rem; }
 .hc-sched .bar { height: 5px; border-radius: 3px; background: var(--ahead); margin-top: .35rem; width: 6rem; overflow: hidden; }
 .hc-sched .bar i { display: block; height: 100%; background: var(--creek); }
 .hc-cell { border-radius: 10px; padding: .45rem .6rem; border: 1px dashed var(--line); min-height: 3.1rem; display: flex; flex-direction: column; gap: .1rem; font-variant-numeric: lining-nums tabular-nums; }
@@ -374,7 +399,7 @@ window.dash = (function () {
   <div class="hc-bar-in">
     <a class="hc-brand" href="#top">Hidden Creek Reserve</a>
     <nav class="hc-tabs" id="hc-tabs" aria-label="Sections">
-      <a href="#today">Today</a><a href="#recap">This week</a><a href="#buildings">Buildings</a><a href="#schedule">Schedule</a><a href="#photos">Photos</a><a href="#upcoming">Coming up</a>
+      <a href="#today">Today</a><a href="#recap">This week</a><a href="#upcoming">Coming up</a><a href="#buildings">Buildings</a><a href="#schedule">Schedule</a><a href="#photos">Photos</a>
     </nav>
   </div>
 </div>
@@ -415,7 +440,7 @@ window.dash = (function () {
     <p class="hc-recap-sum" id="recap-sum"></p>
     <div class="hc-recap-grid">
       <div><h3>This week</h3><ul class="dots" id="recap-this"></ul></div>
-      <div><h3>Next week</h3><ul class="dots open" id="recap-next"></ul></div>
+      <div class="hc-recap-next"><h3>Next week</h3><ul class="dots open" id="recap-next"></ul></div>
     </div>
     <div class="hc-actions">
       <a class="hc-btn primary" id="recap-pdf" href="https://progress.hiddencreekreserve.com/recap.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10m0 0-4-4m4 4 4-4M4 15v2h12v-2"/></svg>Download PDF</a>
@@ -423,6 +448,11 @@ window.dash = (function () {
       <span class="hc-copied" id="recap-copied" role="status"></span>
     </div>
     <textarea id="recap-text" class="hc-recap-text" readonly hidden aria-label="Recap as email text"></textarea>
+  </section>
+
+  <section id="upcoming">
+    <div class="sec-head"><h2>Coming up</h2><p>Target dates can move with weather and crews</p></div>
+    <div class="hc-agenda" id="upcoming-list"></div>
   </section>
 
   <section id="buildings">
@@ -439,9 +469,8 @@ window.dash = (function () {
 
   <section id="schedule">
     <div class="sec-head"><h2>Schedule</h2><p>Each fourplex, phase by phase</p></div>
-    <div class="hc-sched-list" id="sched-list"></div>
-    <div class="hc-sched-wrap"><table class="hc-sched" id="sched-table"></table></div>
-    <p class="hc-note">Actual dates are the first and last days the field notes record the work. Target dates appear as the master schedule fills in. Percent complete is a rough estimate by phase.</p>
+        <div class="hc-sched-wrap"><table class="hc-sched" id="sched-table"></table></div>
+    <p class="hc-note">Actual dates are the first and last days the field notes record the work. Target dates appear as the master schedule fills in.</p>
   </section>
 
   <section id="photos">
@@ -451,12 +480,7 @@ window.dash = (function () {
     <div class="hc-more" id="photo-more" hidden><button class="hc-btn" type="button" id="photo-more-btn">Show all photos</button></div>
   </section>
 
-  <section id="upcoming">
-    <div class="sec-head"><h2>Coming up</h2><p>Target dates can move with weather and crews</p></div>
-    <div class="hc-agenda" id="upcoming-list"></div>
-  </section>
-
-  <p class="hc-foot">Hidden Creek Reserve is a 59-home townhome community with a clubhouse, built in fourplex, triplex and duplex buildings. This page updates each weekday evening from the supervisor's field notes and jobsite photos.</p>
+  <p class="hc-foot">Hidden Creek Reserve is a 59-home townhome community with a clubhouse, built in fourplex, triplex and duplex buildings. This page updates every weekday at noon and 5 PM Central from the supervisor's field notes and jobsite photos.</p>
 </main>
 
 <dialog class="hc-sheet" id="hc-sheet" aria-labelledby="s-name"></dialog>
@@ -539,6 +563,55 @@ window.dash = (function () {
     });
     const pct = Math.round(list.reduce((s, p) => s + (p.status === 'done' ? WEIGHT[p.phase] : p.status === 'now' ? WEIGHT[p.phase] / 2 : 0), 0));
     return { list, pct };
+  };
+  // Foundation is most of the early work, so while a building is in it, show its steps instead of a percent.
+  // Status comes from the dated milestones the refresh writes from the field notes.
+  const FSTEPS = [
+    { name: 'Piers', re: /\bpiers?\b/i, done: /poured|complete|ready|done|finished/i, did: 'Piers poured' },
+    { name: 'Footings', re: /footing/i, done: /footings? poured|footing pour (?:finished|done|complete)/i, did: 'Footings poured' },
+    { name: 'Walls', re: /foundation wall|\bwalls\b/i, done: /walls? (?:were )?poured|strip|ready for/i, did: 'Walls poured' },
+    { name: 'Dampproofing', short: 'Damp\u00adproof', re: /dampproof|drain tile|drainage/i, not: /ready for/i, done: /done|finished|complete/i, did: 'Dampproofing done' },
+    { name: 'Backfill', re: /backfill/i, done: /finished|done|complete/i, did: 'Backfill done' },
+    { name: 'Slab', re: /slab pour|slabs? poured|basement floor|floor pour/i, done: /poured|done|complete|finished/i, did: 'Slab poured' }
+  ];
+  const NOT_WORK = /\b(?:plans?|scheduled|planned|coordinated|approach|approved|delivered|target)\b/i;
+  const footSteps = (building, type) => {
+    const ms = rows('milestones').filter(m => (m.scope === building || covers(m.scope, building, type)) && !NOT_WORK.test(m.milestone));
+    const list = FSTEPS.map(f => {
+      let status = 'wait', date = '';
+      ms.forEach(m => {
+        if (!f.re.test(m.milestone) || (f.not && f.not.test(m.milestone))) return;
+        // the first milestone that says the step happened dates it (later ones are follow-ups like form stripping)
+        if (f.done.test(m.milestone)) { if (status !== 'done' || m.date < date) date = m.date; status = 'done'; }
+        else if (status !== 'done') { status = 'now'; date = !date || m.date < date ? m.date : date; }
+      });
+      return { ...f, status, date };
+    });
+    // anything before the furthest step with work on it is finished
+    let far = -1; list.forEach((x, i) => { if (x.status !== 'wait') far = i; });
+    const fin = rows('schedule').some(r => r.building === building && r.phase === 'Foundation' && r.actual_end);
+    list.forEach((x, i) => { if (fin || i < far) { if (x.status !== 'done') x.date = ''; x.status = 'done'; } });
+    const cur = fin ? list.length - 1 : far;
+    const at = list[cur];
+    const label = !at ? 'Getting started' : at.status === 'done' ? at.did : `${at.name} under way`;
+    const nxt = list.find(x => x.status === 'wait');
+    return { list, label, next: nxt ? nxt.name : null, inFoundation: !fin };
+  };
+  const inFoundation = (b) => {
+    if (b.type !== 'Fourplex') return false;
+    const ph = phaseInfo(b.building).list;
+    return ph[0].status === 'now' || (ph[0].status === 'wait' && Number(b.stage_index) === 2);
+  };
+  const footBar = (fs) => {
+    const wrap = el('div'), bar = el('div', 'hc-phases f6'), lbl = el('div', 'hc-phase-lbl f6');
+    const curIdx = fs.list.findIndex(x => x.status !== 'done');
+    fs.list.forEach((x, i) => { bar.append(el('span', x.status === 'done' ? 'done' : x.status === 'now' ? 'now' : '')); lbl.append(el('span', i === curIdx ? 'now' : '', x.short || x.name)); });
+    bar.setAttribute('aria-hidden', 'true'); wrap.append(bar, lbl); return wrap;
+  };
+  const stepLine = (b) => {
+    if (inFoundation(b)) { const fs = footSteps(b.building, b.type); return fs.label + (fs.next ? ` · next: ${fs.next.toLowerCase()}` : ''); }
+    if (b.type === 'Fourplex') { const ph = phaseInfo(b.building).list, cur = ph.find(p => p.status === 'now'), nx = ph.find(p => p.status === 'wait'); return cur ? `${cur.phase} under way` + (nx ? ` · next: ${nx.phase.toLowerCase()}` : '') : (nx ? `Next: ${nx.phase.toLowerCase()}` : 'Complete'); }
+    return '';
   };
   const phaseText = (p) => {
     const out = [];
@@ -718,15 +791,21 @@ window.dash = (function () {
     id.append(el('div', 'name', r.building), el('div', 'addr', `${r.type} · ${r.units} homes · ${r.addresses}`));
     top.append(id, el('span', 'hc-pill', r.stage));
     body.append(top);
-    if (r.type === 'Fourplex') {
-      const { list, pct } = phaseInfo(r.building);
-      const p = el('div'), pl = el('div', 'hc-pct'); pl.append(el('span', null, 'Progress'), el('span', 'num', `about ${pct}%`));
+    const sl = stepLine(r); if (sl) body.append(el('span', 'step', sl));
+    if (inFoundation(r)) {
+      const fs = footSteps(r.building, r.type);
+      const p = el('div', 'prog'), pl = el('div', 'hc-pct'); pl.append(el('span', null, 'Foundation steps'), el('span', 'cur', fs.label));
+      p.append(pl, footBar(fs)); body.append(p);
+    } else if (r.type === 'Fourplex') {
+      const { list } = phaseInfo(r.building), cur = list.find(x => x.status === 'now');
+      const p = el('div', 'prog'), pl = el('div', 'hc-pct'); pl.append(el('span', null, 'Progress'), el('span', 'cur', cur ? cur.phase : list.every(x => x.status === 'done') ? 'Complete' : 'Up next: ' + (list.find(x => x.status === 'wait') || {}).phase));
       p.append(pl, phaseBar(list)); body.append(p);
     }
     body.append(el('p', 'latest', r.latest));
+    card.append(el('span', 'chev', '›'));
     const foot = el('div', 'foot'); foot.append(el('span', null, 'Updated ' + mdy(r.as_of)), el('span', 'more', 'Details ›'));
     body.append(foot);
-    card.append(cover, body);
+    card.prepend(cover, body);
     const open = () => openSheet(r.building);
     card.addEventListener('click', open);
     card.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); open(); } });
@@ -735,15 +814,15 @@ window.dash = (function () {
 
   // ---------- schedule ----------
   const fourplexes = buildings.filter(b => b.type === 'Fourplex');
-  const tbl = $('sched-table'), list = $('sched-list');
+  const tbl = $('sched-table');
   const thead = el('thead'), hr = el('tr'); hr.append(el('th', null, 'Building'));
   PHASES.forEach(p => hr.append(el('th', null, p))); thead.append(hr); tbl.append(thead);
   const tb = el('tbody');
   fourplexes.forEach(b => {
-    const { list: ph, pct } = phaseInfo(b.building);
+    const { list: ph } = phaseInfo(b.building);
     const tr = el('tr'), th = el('th'); th.scope = 'row';
-    th.append(document.createTextNode(b.building), el('span', 'pct', `about ${pct}% complete`));
-    const bar = el('div', 'bar'), fill = el('i'); fill.style.width = pct + '%'; bar.append(fill); th.append(bar); tr.append(th);
+    th.append(document.createTextNode(b.building), el('span', 'pct', stepLine(b)));
+    tr.append(th);
     ph.forEach(p => {
       const td = el('td'), c = el('div', 'hc-cell ' + p.status);
       if (p.status === 'done') c.append(el('span', 's', 'Done ' + md(p.actual_end)), el('span', 'd', 'Started ' + md(p.actual_start)));
@@ -754,17 +833,18 @@ window.dash = (function () {
       td.append(c); tr.append(td);
     });
     tb.append(tr);
-    // phone version
-    const card = el('div', 'hc-sl'), h = el('div', 'h');
-    h.append(el('b', null, b.building), el('span', 'muted num', `about ${pct}% complete`));
-    card.append(h, phaseBar(ph));
-    const det = el('ul', 'hc-sl-det');
-    ph.filter(p => p.status !== 'wait').forEach(p => { const { text, note, late } = phaseText(p); const li = el('li', p.status); li.append(el('b', null, p.phase), el('span', late ? 'late' : '', [text, note].filter(Boolean).join(' · '))); det.append(li); });
-    const nxt = ph.find(p => p.status === 'wait');
-    if (nxt) { const li = el('li', 'wait'); li.append(el('b', null, 'Up next'), el('span', null, nxt.phase + (nxt.planned_start ? ', target start ' + md(nxt.planned_start) : ''))); det.append(li); }
-    card.append(det); list.append(card);
   });
   tbl.append(tb);
+  function footStepsList(fs) {
+    const ol = el('ol', 'hc-steps');
+    fs.list.forEach(x => {
+      const li = el('li', x.status), info = el('div');
+      li.append(el('span', 'dot'));
+      info.append(el('span', 't', x.name), el('span', 'd', x.status === 'done' ? (x.date ? `Done ${md(x.date)}` : 'Done') : x.status === 'now' ? `Started ${md(x.date)}` : 'Not started'));
+      li.append(info); ol.append(li);
+    });
+    return ol;
+  }
   function steps(ph) {
     const ol = el('ol', 'hc-steps');
     ph.forEach(p => {
@@ -865,9 +945,10 @@ window.dash = (function () {
     const secs = tabs.map(a => document.querySelector(a.getAttribute('href')));
     const onScroll = () => {
       bar.classList.toggle('stuck', window.scrollY > 40);
+      const vis = tabs.map((a, i) => !!(secs[i] && secs[i].offsetParent !== null && a.offsetParent !== null));
       const y = window.scrollY + window.innerHeight * .3;
-      let cur = 0; secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top + window.scrollY <= y) cur = i; });
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = secs.length - 1;
+      let cur = 0; secs.forEach((s, i) => { if (vis[i] && s.getBoundingClientRect().top + window.scrollY <= y) cur = i; });
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) { for (let i = secs.length - 1; i >= 0; i--) if (vis[i]) { cur = i; break; } }
       tabs.forEach((a, i) => {
         const on = i === cur;
         if (on && a.getAttribute('aria-current') !== 'true') { const nav = $('hc-tabs'); nav.scrollTo({ left: a.offsetLeft - nav.clientWidth / 2 + a.clientWidth / 2, behavior: 'smooth' }); }
@@ -892,6 +973,7 @@ window.dash = (function () {
     if (p.caption) cap.append(document.createTextNode(p.caption));
     cap.append(el('span', 'm', `${p.building} · ${mdy(p.date)}`));
     $('lb-prev').disabled = lbIdx === 0; $('lb-next').disabled = lbIdx === lbList.length - 1;
+    [lbIdx + 1, lbIdx - 1].forEach(j => { const q = lbList[j]; if (q && !/^data:/.test(q.src)) { const im = new Image(); im.src = q.src; } });
   };
   const lbGo = (d) => { const n = lbIdx + d; if (n < 0 || n >= lbList.length) { lbImg.style.transform = `translateX(${-d * 18}px)`; setTimeout(() => { lbImg.style.transform = ''; }, 180); return; } lbIdx = n; lbShow(d); };
   const openLb = (l, i) => { lbList = l; lbIdx = i; lbShow(0); try { lb.showModal(); } catch (e) { lb.setAttribute('open', ''); } };
@@ -912,7 +994,7 @@ window.dash = (function () {
   })();
   const thumb = (p, l, i) => {
     const b = el('button'); b.type = 'button'; b.setAttribute('aria-label', `Open photo: ${p.building}, ${md(p.date)}`);
-    const img = el('img'); img.src = p.src; img.alt = p.caption || `${p.building} on ${md(p.date)}`; img.loading = 'lazy'; img.decoding = 'async';
+    const img = el('img'); img.src = p.thumb || p.src; img.alt = p.caption || `${p.building} on ${md(p.date)}`; img.loading = 'lazy'; img.decoding = 'async';
     b.append(img); b.onclick = (e) => { e.stopPropagation(); openLb(l, i); }; return b;
   };
 
@@ -985,9 +1067,13 @@ window.dash = (function () {
     if (tl.length) s3.append(timelineStrip(tl, own));
     else s3.append(el('p', 'empty', photosReady ? 'No photos of this building yet.' : 'Photos are loading…'));
     body.append(s3);
+    if (inFoundation(r)) {
+      const fs = footSteps(r.building, r.type);
+      const s2 = el('div'); s2.append(el('h3', null, `Foundation · ${fs.label.toLowerCase()}`), footStepsList(fs)); body.append(s2);
+    }
     if (r.type === 'Fourplex') {
-      const { list: ph, pct } = phaseInfo(r.building);
-      const s2 = el('div'); s2.append(el('h3', null, `Progress · about ${pct}% complete`), steps(ph)); body.append(s2);
+      const { list: ph } = phaseInfo(r.building);
+      const s2 = el('div'); s2.append(el('h3', null, 'Phases'), steps(ph)); body.append(s2);
     }
     const up = upcoming.filter(u => covers(u.scope, r.building, r.type) || u.scope === r.building);
     if (up.length) {
@@ -1054,7 +1140,7 @@ window.dash = (function () {
       const own = photos.filter(p => p.building === r.building), card = $('b-' + lotKey(r.building));
       if (!card || !own.length) return;
       const cv = card.querySelector('.cover'); cv.textContent = '';
-      const img = el('img'); img.src = own[0].src; img.alt = `${r.building}, ${md(own[0].date)}`; img.decoding = 'async';
+      const img = el('img'); img.src = own[0].thumb || own[0].src; img.alt = `${r.building}, ${md(own[0].date)}`; img.decoding = 'async'; img.loading = 'lazy';
       cv.append(img, el('span', 'n', plural(own.length, 'photo'))); cv.hidden = false;
     });
   }
