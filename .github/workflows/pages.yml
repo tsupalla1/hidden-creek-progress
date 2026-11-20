@@ -35,6 +35,20 @@ jobs:
           key: photos-${{ hashFiles('photos/**') }}
           restore-keys: photos-
       - run: python3 tools/web_build.py index.html _site
+      # Guard the speed gain: stop before publishing if the page balloons again
+      # (the live site then stays on its last good version and GitHub emails a failed run)
+      - name: Check page size
+        run: |
+          size=$(stat -c %s _site/index.html)
+          echo "index.html is $((size / 1024)) KB"
+          if grep -q 'data:image/webp;base64' _site/index.html; then
+            echo "::error::Photos are packed inside the website page again (they should be files in p/)"; exit 1
+          fi
+          if [ "$size" -gt 768000 ]; then
+            echo "::error::index.html is $((size / 1024)) KB, expected about 300 KB"; exit 1
+          elif [ "$size" -gt 450000 ]; then
+            echo "::warning::index.html grew to $((size / 1024)) KB (it was about 300 KB)"
+          fi
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
