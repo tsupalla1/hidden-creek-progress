@@ -15,7 +15,8 @@ writes a light copy instead:
   tiles and a large one for the photo viewer. Phones only fetch the ones
   that scroll into view, and keep them cached between visits;
 - the site plan becomes plat.webp;
-- recap.pdf, og.jpg, CNAME and the converted drone clips are copied as is.
+- recap.pdf, og.jpg, CNAME and the converted drone clips are copied as is;
+- the GoatCounter visitor-count script is added at the end (website only).
 
 Converted photos are kept in .cache/photos (by file content), so a run only
 converts new uploads. GitHub Actions runs this on every push to main
@@ -38,6 +39,11 @@ ROOT = ph.ROOT
 CACHE = ROOT / ".cache" / "photos"
 SIZES = {"t": (720, 60), "f": (1600, 66)}   # tile/cover, photo viewer
 VERSION = "1"                                  # bump to redo every conversion
+
+# Visitor counts (goatcounter.com): no cookies, no banner, loads after the page.
+# Added only to the website copy, never to index.html, so the claude.ai copy
+# stays self-contained. Set to "" to turn counting off.
+GOATCOUNTER = "hiddencreekreserve"
 
 
 def convert(path):
@@ -113,6 +119,9 @@ def main(page, site):
                  ("{{PHOTOS}}", json.dumps(photos, ensure_ascii=False).replace("</", "<\\/")),
                  ("{{VIDEOS}}", vm.group(1) if vm else "[]")]:
         tpl = tpl.replace(k, v)
+    if GOATCOUNTER:
+        tpl = tpl.rstrip() + (f'\n<script data-goatcounter="https://{GOATCOUNTER}.goatcounter.com/count"'
+                              ' async src="https://gc.zgo.at/count.js"></script>\n')
     if not tpl.lstrip().lower().startswith("<!doctype"):
         tpl = '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n' + tpl.lstrip()
     (site / "index.html").write_text(tpl)
