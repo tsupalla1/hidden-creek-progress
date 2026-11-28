@@ -86,8 +86,9 @@ window.dash = (function () {
 .sec-head p { margin: 0; color: var(--muted); font-size: .95rem; font-style: italic; }
 
 /* Hero */
-.hc-hero { display: grid; grid-template-columns: 1fr; gap: 1.5rem; padding-top: 1rem; }
-@media (min-width: 860px) { .hc-hero { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; } }
+.hc-hero { display: grid; grid-template-columns: 1fr; grid-template-areas: "title" "plan" "take" "today"; gap: 1.5rem; padding-top: 1rem; }
+.hc-hero .hc-title { grid-area: title; } .hc-hero .hc-plan { grid-area: plan; margin-bottom: 0; } .hc-hero .hc-take { grid-area: take; margin: 0; } .hc-hero .hc-today { grid-area: today; }
+@media (min-width: 860px) { .hc-hero { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: "title today" "take today" "plan plan"; gap: 1rem 2.5rem; align-items: start; } .hc-hero .hc-plan { margin-top: 1rem; } }
 .hc-title h1 { font-weight: 400; font-size: clamp(2.3rem, 10vw, 3.8rem); line-height: 1; letter-spacing: -.012em; margin: .45rem 0 .6rem; text-wrap: balance; }
 .hc-title .loc { color: var(--creek); font-style: italic; font-size: 1.15rem; margin: 0; }
 .hc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem; margin-top: .7rem; }
@@ -380,7 +381,7 @@ window.dash = (function () {
   .hc-today .rel { display: none; }
   .hc { gap: 1.3rem; max-width: none; padding: 0; font-size: 10.5pt; }
   .hc-page { font-size: 10.5pt; }
-  .hc-hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1.2rem; padding-top: 0; }
+  .hc-hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-areas: "title today" "take today" "plan plan"; gap: .8rem 1.2rem; padding-top: 0; }
   .hc-title h1 { font-size: 30pt; }
   .hc-stats { margin-top: 0; }
   .hc-stat .val { font-size: 22pt; }
@@ -418,7 +419,14 @@ window.dash = (function () {
         <p class="hc-updated">Last updated <time id="hc-updated" datetime="{{UPDATED}}"></time></p>
         <button class="hc-share" id="hc-share" type="button">Share this page</button>
       </div>
-      <p class="hc-take" id="takeaway"></p>
+    </div>
+    <p class="hc-take" id="takeaway"></p>
+    <div class="hc-plan" id="street">
+      <div class="hc-map" id="hc-map"><svg id="hc-overlay" viewBox="0 0 1550 770" role="group" aria-label="Hidden Creek Reserve site plan, buildings shaded by construction stage"><rect width="1550" height="770" fill="#fff"/><image id="hc-plat" width="1550" height="770"/><g id="hc-blds"></g></svg><div class="hc-tip" id="hc-tip" hidden></div></div>
+      <div class="hc-plan-foot">
+        <div class="hc-legend" id="hc-legend"></div>
+        <div class="hc-seg" role="group" aria-label="Site plan view"><button type="button" id="v-active" aria-pressed="true">Active buildings</button><button type="button" id="v-all" aria-pressed="false">Whole site</button></div>
+      </div>
     </div>
     <section class="hc-today" id="today" aria-labelledby="today-h">
       <p class="eyebrow" id="today-h">Latest from the site</p>
@@ -460,13 +468,6 @@ window.dash = (function () {
 
   <section id="buildings">
     <div class="sec-head"><h2>The buildings</h2><p>Tap a building for its progress, photos and what's next</p></div>
-    <div class="hc-plan" id="street">
-      <div class="hc-map" id="hc-map"><svg id="hc-overlay" viewBox="0 0 1550 770" role="group" aria-label="Hidden Creek Reserve site plan, buildings shaded by construction stage"><rect width="1550" height="770" fill="#fff"/><image id="hc-plat" width="1550" height="770"/><g id="hc-blds"></g></svg><div class="hc-tip" id="hc-tip" hidden></div></div>
-      <div class="hc-plan-foot">
-        <div class="hc-legend" id="hc-legend"></div>
-        <div class="hc-seg" role="group" aria-label="Site plan view"><button type="button" id="v-active" aria-pressed="true">Active buildings</button><button type="button" id="v-all" aria-pressed="false">Whole site</button></div>
-      </div>
-    </div>
     <div class="hc-bldgs" id="bldg-cards"></div>
   </section>
 
